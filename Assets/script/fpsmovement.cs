@@ -49,14 +49,13 @@ public class fpsmovement : MonoBehaviour
     void Update()
     {
 
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            Taser();
-        }
-
         if (Input.GetKeyDown(KeyCode.Space))  // JUMP
         {
-            Jump();
+            if (Wallrunscript == null || !Wallrunscript.IsWallrunning)
+            {
+                Jump();
+            }
+
         }
 
         Sprint();
@@ -66,10 +65,6 @@ public class fpsmovement : MonoBehaviour
     void FixedUpdate()
     {
 
-        if (Wallrunscript != null && Wallrunscript.IsWallrunning)
-        {
-            return;
-        }
        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         
         float z = Input.GetAxis("Vertical");
@@ -78,31 +73,22 @@ public class fpsmovement : MonoBehaviour
         mousex += Input.GetAxis("Mouse X") * mousesensitivity;
         mousey -= Input.GetAxis("Mouse Y") * mousesensitivity;
 
-        
+        mousey = Mathf.Clamp(mousey,-90f,40f);
+        transform.rotation = Quaternion.Euler(mousey,mousex,0f);
 
+        if (Wallrunscript != null && Wallrunscript.IsWallrunning)
+        {
+            return;
+        }
         movedirection = transform.forward * z + transform.right * x;
+
        rb.linearVelocity = new Vector3(movedirection.x * Currentspeed , rb.linearVelocity.y, movedirection.z * Currentspeed );  
        transform.rotation = Quaternion.Euler(mousey, mousex , transform.rotation.z);
 
     }
 
 
-    private void Taser()
-    {
-        RaycastHit hit;
 
-       if (Physics.Raycast(camHolder.position, camHolder.forward, out hit, raylength))
-        {
-            Ishockable shockable = hit.collider.GetComponent <Ishockable>();
-
-            if(shockable != null)
-            {
-                shockable.Recieveshock(10f);
-            }
-
-        }
-
-    }
 
 
     private void Jump()

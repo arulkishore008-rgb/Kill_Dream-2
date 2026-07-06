@@ -6,4 +6,9 @@ public class Interfaces : MonoBehaviour
     {
         void Recieveshock(float schockpower);
     }
+
+    public interface Iweapon
+    {
+        void useweapon();
+    }
 }

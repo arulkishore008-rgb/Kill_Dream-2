@@ -77,6 +77,8 @@ public class Wallrunning : MonoBehaviour
             {
                 StartWallrun();
 
+            }
+
                 if (Input.GetKeyDown(KeyCode.Space))
                 {
                     Walljump();
@@ -91,7 +93,7 @@ public class Wallrunning : MonoBehaviour
                     exitingWallTimer = exitingWalltime;
                 }
 
-            }
+            
 
             else if (exitingWall)     // 2
             {
@@ -99,7 +101,7 @@ public class Wallrunning : MonoBehaviour
                     stopwallrun();
 
                 if (exitingWallTimer > 0)
-                    exitingWalltime -= Time.deltaTime;
+                    exitingWallTimer -= Time.deltaTime;
                 
                 if(exitingWalltime <= 0)
                     exitingWall = false;
