@@ -29,7 +29,6 @@ public class Equipment_manager : MonoBehaviour
     public void EquipItem(Items ItemtoEquip)
     {
 
-
         if (ItemtoEquip == null || ItemtoEquip.weapon == null )  return;
 
 

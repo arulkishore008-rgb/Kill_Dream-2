@@ -32,7 +32,7 @@ public class InventoryManager : MonoBehaviour
                 if (slot.items == ItemsToAdd && slot.amount < ItemsToAdd.maxStacksize)
                 {
                     int spaceLeft = ItemsToAdd.maxStacksize - slot.amount;
-                    int AmountcanAdd = Mathf.Min(spaceLeft - amountToAdd);
+                    int AmountcanAdd = Mathf.Min(spaceLeft , amountToAdd);
 
                     slot.AddAmount(AmountcanAdd);
                     amountToAdd -= AmountcanAdd;

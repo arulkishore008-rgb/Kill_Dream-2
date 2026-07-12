@@ -1,6 +1,9 @@
 using System.ComponentModel;
+using Unity.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Rendering;
 using static Interfaces;
 
 public class fpsmovement : MonoBehaviour 
@@ -15,8 +18,9 @@ public class fpsmovement : MonoBehaviour
     float mousex;
     float mousey;
 
-    private bool Isjumping;
+    private bool Canjump;
 
+    [Header("Movement")]
     
     public float Currentspeed;
     public float walkspeed = 3f;
@@ -28,7 +32,22 @@ public class fpsmovement : MonoBehaviour
     Vector3 movedirection;
     public Transform Jumpchecktransform;
     public float Jumpchecklength;
+
+
+    [Header("Camera Tilt")]
+
     public Transform camHolder;
+    public float Maxtilt = 15f;
+    public float Tiltspeed = 5f;
+    private float CurrentTilt = 0f;
+
+    [Header("GrappleHook")]
+
+    public float GrappleCheckLength;
+    public LayerMask Wall_Layer;
+    public float ellapsedtime;
+    public float Time_Taken = 4f;
+
 
     public LayerMask Ground;
 
@@ -49,9 +68,9 @@ public class fpsmovement : MonoBehaviour
     void Update()
     {
 
-        if (Input.GetKeyDown(KeyCode.Space))  // JUMP
+        if (Input.GetKeyDown(KeyCode.Space) && Canjump == false)  // JUMP
         {
-            if (Wallrunscript == null || !Wallrunscript.IsWallrunning)
+            if (Wallrunscript != null || !Wallrunscript.IsWallrunning)
             {
                 Jump();
             }
@@ -59,6 +78,9 @@ public class fpsmovement : MonoBehaviour
         }
 
         Sprint();
+      //  GrapppleHook();
+         
+       
 
     }
 
@@ -76,33 +98,74 @@ public class fpsmovement : MonoBehaviour
         mousey = Mathf.Clamp(mousey,-90f,40f);
         transform.rotation = Quaternion.Euler(mousey,mousex,0f);
 
-        if (Wallrunscript != null && Wallrunscript.IsWallrunning)
-        {
-            return;
-        }
         movedirection = transform.forward * z + transform.right * x;
 
-       rb.linearVelocity = new Vector3(movedirection.x * Currentspeed , rb.linearVelocity.y, movedirection.z * Currentspeed );  
-       transform.rotation = Quaternion.Euler(mousey, mousex , transform.rotation.z);
+        float TargetTilt = 0f;
 
+        if (Wallrunscript != null && Wallrunscript.IsWallrunning)
+        {
+            if(Wallrunscript.wallleft) TargetTilt = -Maxtilt;
+            else if (Wallrunscript.wallright) TargetTilt = Maxtilt;
+        }
+
+        CurrentTilt = Mathf.Lerp(CurrentTilt, TargetTilt , Targetspeed * Time.deltaTime);
+
+       rb.linearVelocity = new Vector3(movedirection.x * Currentspeed , rb.linearVelocity.y, movedirection.z * Currentspeed );  
+
+       transform.rotation = Quaternion.Euler(mousey, mousex , CurrentTilt);
+
+        if (camHolder != null)
+        {
+            camHolder.localRotation = Quaternion.Euler(mousey, 0f, CurrentTilt);
+        }
+
+        if (Wallrunscript != null && Wallrunscript.IsWallrunning && Wallrunscript.exitingWall)
+        {
+            return;
+
+        }
     }
 
 
+    public void GrapppleHook()
+    {
+        float t = ellapsedtime / Time_Taken;
+        ellapsedtime += Time.deltaTime;
+        if (Input.GetMouseButtonDown(0))
+        {
+            Ray GrappleRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
 
+            if (Physics.Raycast(GrappleRay, out hit) && Physics.Raycast(camHolder.position,camHolder.forward,GrappleCheckLength,Wall_Layer))
+            {
+                Vector3 clickedPosition = hit.point;
+
+                transform.position = Vector3.Slerp(transform.position,clickedPosition,t);
+                Debug.Log(clickedPosition);
+            }
+                
+        }
+    }
 
 
     private void Jump()
-    
         {
-            if (Physics.Raycast(Jumpchecktransform.position, Vector3.down, Jumpchecklength , Ground))
+
+         if (Wallrunscript != null && Wallrunscript.IsWallrunning)
+            return;
+
+
+        if (Physics.Raycast(Jumpchecktransform.position, Vector3.down, Jumpchecklength , Ground))
             {
-                Isjumping = false;
+
+                Debug.Log("Hitting Ground");
+                Canjump = false;
                 rb.AddForce(Vector3.up * jumpforce, ForceMode.Impulse);
             }
 
             else
             {
-                Isjumping = true; 
+                Canjump = true; 
             }
         }
 
@@ -121,6 +184,7 @@ public class fpsmovement : MonoBehaviour
     {
         Debug.DrawRay(camHolder.position, camHolder.forward * raylength, Color.red);
         Debug.DrawRay(Jumpchecktransform.position, Vector3.down * Jumpchecklength, Color.blue);
+        Debug.DrawRay(camHolder.position,camHolder.forward * GrappleCheckLength,Color.black);
 
     }
 

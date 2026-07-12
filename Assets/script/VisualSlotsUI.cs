@@ -9,7 +9,7 @@ public class VisualSlotsUI : MonoBehaviour
     public Text amountText;
     public Button slotButton;
 
-    private Items currentItemData; 
+    private Items currentItemData;
     private Equipment_manager equipmentManager;
 
     public void SetupSlot(Equipment_manager manager)
@@ -20,7 +20,7 @@ public class VisualSlotsUI : MonoBehaviour
     }
 
 
-    public void SetItem(Items item , int amount)
+    public void SetItem(Items item, int amount)
     {
         currentItemData = item;
 
@@ -41,11 +41,14 @@ public class VisualSlotsUI : MonoBehaviour
 
     public void ClearSlot()
     {
+        currentItemData = null;
+
+
         Itemicon.sprite = null;
         Itemicon.enabled = false;
 
         amountText.text = "";
-        amountText.enabled= false;
+        amountText.enabled = false;
     }
 
     public void EquipButtonClicked()
@@ -54,23 +57,13 @@ public class VisualSlotsUI : MonoBehaviour
 
         if (currentItemData != null)
         {
-            Debug.Log("slot has data " + currentItemData.name + " sending to manager" );
+            Debug.Log("slot has data " + currentItemData.name + " sending to manager");
             equipmentManager.EquipItem(currentItemData);
 
             if (equipmentManager != null)
             {
                 equipmentManager.EquipItem(currentItemData);
             }
-            else
-            {
-                Debug.LogError("ERROR: EquipmentManager is null! The UI doesn't know who to talk to.");
-            }
-        }
-
-        else
-        {
-            Debug.Log("ERROR: Button clicked, but currentItemData is empty.");
         }
     }
-
 }

@@ -25,15 +25,15 @@ public class Wallrunning : MonoBehaviour
     public float Minjumpheight;
     private RaycastHit Isleftwallhit;
     private RaycastHit Isrightwallhit;
-    private bool wallleft;
-    private bool wallright;
+    public bool wallleft;
+    public bool wallright;
     public bool IsWallrunning;
 
     private Rigidbody rb;
     public Transform CamHolder;
 
     [Header("Exiting")]
-    private bool exitingWall;
+    public bool exitingWall;
     public float exitingWalltime;
     public float exitingWallTimer;
     
@@ -71,9 +71,22 @@ public class Wallrunning : MonoBehaviour
         horizontalinput = Input.GetAxis("Horizontal");
         verticalinput = Input.GetAxis("Vertical");
 
+         if (exitingWall)     // 1
+    {
+          if (IsWallrunning)
+                        stopwallrun();
+
+          if (exitingWallTimer > 0)
+                        exitingWallTimer -= Time.deltaTime;
+
+              else
+              exitingWall = false;
+             
+    }
+
         if ((wallleft || wallright ) && verticalinput > 0f && Aboveground() && !exitingWall)
         {
-            if (!IsWallrunning)  // 1
+            if (!IsWallrunning)  // 2
             {
                 StartWallrun();
 
@@ -95,18 +108,6 @@ public class Wallrunning : MonoBehaviour
 
             
 
-            else if (exitingWall)     // 2
-            {
-                if (IsWallrunning)
-                    stopwallrun();
-
-                if (exitingWallTimer > 0)
-                    exitingWallTimer -= Time.deltaTime;
-                
-                if(exitingWalltime <= 0)
-                    exitingWall = false;
-                
-            }
 
         }
 
@@ -150,7 +151,6 @@ public class Wallrunning : MonoBehaviour
     {
         IsWallrunning = false;
         rb.useGravity = true;
-        rb.linearVelocity = new Vector3(rb.linearVelocity.x, rb.linearVelocity.y, rb.linearVelocity.z);
 
     }
 
@@ -159,14 +159,24 @@ public class Wallrunning : MonoBehaviour
         exitingWall = true;
         exitingWallTimer = exitingWalltime;
 
+        stopwallrun();
 
-        Vector3 Wallnormal = wallright ? Isrightwallhit.normal : Isleftwallhit.normal;
+        Vector3 WallNormal = wallright ? Isrightwallhit.normal : Isleftwallhit.normal;
 
-        Vector3 forcetoApply = transform.up * WallJumpupForce + Wallnormal * WallJumpsideForce;
-        rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f , rb.linearVelocity.z);
+        Vector3 WallForward = Vector3.Cross(WallNormal, transform.up);
+        if ((transform.forward - WallForward).magnitude > (transform.forward - -WallForward).magnitude)
+        {
+            WallForward = -WallForward;
+        }
+
+        float keepSpeed = rb.linearVelocity.magnitude;
+
+        rb.linearVelocity = Vector3.zero;
+
+        Vector3 forcetoApply = (transform.up * WallJumpupForce) + (WallNormal * WallJumpsideForce) + (WallForward * keepSpeed);
+
         rb.AddForce(forcetoApply, ForceMode.Impulse);
     }
-
     private void OnDrawGizmos()
     {
         Debug.DrawRay(CamHolder.position, transform.right * Wallcheckdistance, Color.green);
