@@ -16,3 +16,7 @@ MonoBehaviour:
   weapon_Damage: 0
   weapon_Range: 0
   weapon: {fileID: 4443132480661645338, guid: e3c2a5e3618424b4b887d4989e909615, type: 3}
+  IsStackable: 0
+  maxStacksize: 0
+  icon: {fileID: 0}
+  IsThrowable: 1

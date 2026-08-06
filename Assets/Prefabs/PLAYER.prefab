@@ -1,5 +1,37 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2525976011933430031
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2643889693831718537}
+  m_Layer: 6
+  m_Name: CamHolder
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2643889693831718537
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2525976011933430031}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 4798651285837952609}
+  m_Father: {fileID: 4715341215884565979}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3489775859400710487
 GameObject:
   m_ObjectHideFlags: 0
@@ -28,14 +60,14 @@ Transform:
   m_GameObject: {fileID: 3489775859400710487}
   serializedVersion: 2
   m_LocalRotation: {x: 0.10892506, y: -0, z: -0, w: 0.99404997}
-  m_LocalPosition: {x: 0, y: 0.17, z: 0.44}
+  m_LocalPosition: {x: 0, y: 0.16999996, z: 0.44000053}
   m_LocalScale: {x: 1, y: 0.3574809, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2991377811321364729}
   - {fileID: 8962928212413581091}
   - {fileID: 914331829444821342}
-  m_Father: {fileID: 4715341215884565979}
+  m_Father: {fileID: 2643889693831718537}
   m_LocalEulerAnglesHint: {x: 12.507, y: 0, z: 0}
 --- !u!20 &5520771544852892189
 Camera:
@@ -292,8 +324,7 @@ GameObject:
   - component: {fileID: 3988597683046794176}
   - component: {fileID: 3274965005124664648}
   - component: {fileID: 8301847172636255969}
-  - component: {fileID: 994252299220666366}
-  - component: {fileID: 859183441549620987}
+  - component: {fileID: 4554126834607911118}
   m_Layer: 6
   m_Name: PLAYER
   m_TagString: Player
@@ -315,7 +346,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4030338109578857088}
-  - {fileID: 4798651285837952609}
+  - {fileID: 2643889693831718537}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &1536352742814228718
@@ -350,8 +381,7 @@ MeshRenderer:
   m_MeshLodSelectionBias: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 6c3b11f41bd0b6a4294258418c49ec72, type: 2}
+  m_Materials: []
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -445,18 +475,20 @@ MonoBehaviour:
   acceleration: 2
   Jumpchecktransform: {fileID: 914331829444821342}
   Jumpchecklength: 4
+  globalvolume: {fileID: 0}
+  SprintVignette: 0
+  VignetteSpeed: 0
   camHolder: {fileID: 4798651285837952609}
   Maxtilt: 15
   Tiltspeed: 5
-  GrappleCheckLength: 11.21
-  Wall_Layer:
-    serializedVersion: 2
-    m_Bits: 256
-  ellapsedtime: 0
-  Time_Taken: 0
+  Camera: {fileID: 0}
+  Interactive_img: {fileID: 0}
   Ground:
     serializedVersion: 2
     m_Bits: 512
+  Enemy_Layer:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!114 &8301847172636255969
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -491,7 +523,7 @@ MonoBehaviour:
   exitingWall: 0
   exitingWalltime: 0.6
   exitingWallTimer: 0
---- !u!114 &994252299220666366
+--- !u!114 &4554126834607911118
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -500,24 +532,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 7499972731564344186}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e1884df3cf2fe8249afd6e2dd875f8fb, type: 3}
+  m_Script: {fileID: 11500000, guid: 0b8271192abe2654db01bc259b893494, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Equipment_manager
-  WeaponHolder: {fileID: 8962928212413581091}
---- !u!114 &859183441549620987
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7499972731564344186}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 069ab992cbca4c24fae67670be59a537, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::InventoryManager
-  MaxSlots: 8
-  Slots: []
+  m_EditorClassIdentifier: Assembly-CSharp::GrappleHook
+  camHolder: {fileID: 4798651285837952609}
+  Wall_Layer:
+    serializedVersion: 2
+    m_Bits: 0
+  playerMovement: {fileID: 3274965005124664648}
+  maxChargeTime: 2
+  maxGrappleDistance: 50
+  flySpeed: 30
+  MaxFOV: 0
+  CurrentFOV: 0
+  LerpTime: 0
 --- !u!1 &8171389089832524543
 GameObject:
   m_ObjectHideFlags: 0

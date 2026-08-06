@@ -15,7 +15,9 @@ MonoBehaviour:
   Weapon_names: Taser
   weapon_Damage: 20
   weapon_Range: 1
-  weapon: {fileID: 3296853871780648755, guid: 98b1bf2a10a24f443934c430eb9f9b20, type: 3}
+  Prefab: {fileID: 3296853871780648755, guid: 98b1bf2a10a24f443934c430eb9f9b20, type: 3}
   IsStackable: 1
-  maxStacksize: 0
+  maxStacksize: 5
   icon: {fileID: 21300000, guid: 029226d42bacd1f4abda44026066131c, type: 3}
+  IsThrowable: 1
+  handPrefab: {fileID: 2028906699637845416, guid: a68ceaf4a59758b47b3b2e0f756d47d9, type: 3}

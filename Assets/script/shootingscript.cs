@@ -2,17 +2,19 @@ using UnityEngine;
 
 public class shootingscript : MonoBehaviour
 {
-    public GameObject bullet;
-    public float speed;
-    public Camera cam;
+    private Camera cam;
     public float damage = 10f;
     public float range = 100f;
     public float Timetofire = 1f;
     public float firerate = 15f;
     public float hitforce = 60f;
+
+    public GameObject SmokeEffect;
+    public Transform SmokeTrans;
+
     void Start()
     {
-
+        cam = Camera.main;
     }
 
     void Update()
@@ -27,6 +29,9 @@ public class shootingscript : MonoBehaviour
     void shoot()
     {
         RaycastHit hit;
+
+        GameObject smokeefx = Instantiate(SmokeEffect,SmokeTrans.position,cam.transform.rotation);
+        Destroy(smokeefx,1f);
 
        if (Physics.Raycast(cam.transform.position, cam.transform.forward, out hit, range))
         {

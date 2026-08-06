@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6ef202949982f5499b5b5668815246d, type: 3}
+  m_Name: Grenade
+  m_EditorClassIdentifier: Assembly-CSharp::Items
+  Weapon_names: Grenade
+  weapon_Damage: 0
+  weapon_Range: 0
+  Prefab: {fileID: 9061481640906726207, guid: b38105aec943d004ba262e6bfc226701, type: 3}
+  IsStackable: 0
+  maxStacksize: 2
+  icon: {fileID: 21300000, guid: af2c65aa422e9714db11aca6499f83dc, type: 3}
+  IsThrowable: 1
+  handPrefab: {fileID: 9061481640906726207, guid: 5c06c1a9f2d0ffb4a83833d2d54c349b, type: 3}

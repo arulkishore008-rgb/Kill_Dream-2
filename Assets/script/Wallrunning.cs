@@ -62,7 +62,6 @@ public class Wallrunning : MonoBehaviour
         wallleft = Physics.Raycast(CamHolder.position, -transform.right, out Isleftwallhit, Wallcheckdistance, Iswall);
         wallright = Physics.Raycast(CamHolder.position, transform.right, out Isrightwallhit, Wallcheckdistance, Iswall);
 
-
     }
 
 
@@ -117,6 +116,7 @@ public class Wallrunning : MonoBehaviour
                  stopwallrun();
             }
     }
+    
 
     private void WallRunning()
     {

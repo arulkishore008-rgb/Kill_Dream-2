@@ -4,11 +4,13 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 using static Interfaces;
 
 public class fpsmovement : MonoBehaviour 
 {
     Rigidbody rb;
+    public Transform EnemyInteractPoint;
     private Wallrunning Wallrunscript;
     public float mousesensitivity;
 
@@ -18,7 +20,7 @@ public class fpsmovement : MonoBehaviour
     float mousex;
     float mousey;
 
-    private bool Canjump;
+    public static bool Canjump;
 
     [Header("Movement")]
     
@@ -33,6 +35,12 @@ public class fpsmovement : MonoBehaviour
     public Transform Jumpchecktransform;
     public float Jumpchecklength;
 
+    public Volume globalvolume;
+    private Vignette vignette;
+    public float SprintVignette;
+    public float VignetteSpeed;
+    public bool IsSprinting;
+
 
     [Header("Camera Tilt")]
 
@@ -41,44 +49,116 @@ public class fpsmovement : MonoBehaviour
     public float Tiltspeed = 5f;
     private float CurrentTilt = 0f;
 
-    [Header("GrappleHook")]
-
-    public float GrappleCheckLength;
-    public LayerMask Wall_Layer;
-    public float ellapsedtime;
-    public float Time_Taken = 4f;
+    public Camera Camera;
+    public GameObject Interactive_img;
 
 
     public LayerMask Ground;
+    public LayerMask Enemy_Layer;
 
 
-   
+    [Header("Camera Movements")]
+
+    Vector3 startPos;
+    public float bobSpeed;
+    public float bobAmount;
+    public float Timer;
+
+
+    // private Animator anim;
+
+
+
 
     void Start()
     {
+        startPos = camHolder.localPosition;
         rb = GetComponent<Rigidbody>();
         Wallrunscript = GetComponent<Wallrunning>();
+      //  anim = GetComponent<Animator>();
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         transform.rotation = Quaternion.identity;
-        
-        
+
+        if (globalvolume == null) return;
+
+        globalvolume.profile.TryGet<Vignette>(out vignette);
+        Interactive_img.SetActive(false);
+
     }
 
     void Update()
     {
 
-        if (Input.GetKeyDown(KeyCode.Space) && Canjump == false)  // JUMP
+        if (Input.GetKeyDown(KeyCode.Space) && Canjump)  // JUMP
         {
-            if (Wallrunscript != null || !Wallrunscript.IsWallrunning)
+            if (!Wallrunscript.IsWallrunning)
             {
-                Jump();
+                rb.AddForce(Vector3.up * jumpforce , ForceMode.Impulse);
             }
 
         }
 
+        if (Input.GetAxis("Vertical") > .1f)
+        {
+            Timer += Time.deltaTime * bobSpeed;
+            float y = Mathf.Sin(Timer) * bobAmount;
+            camHolder.localPosition = startPos + new Vector3(0f, y, 0f);
+
+        }
+        else
+        {
+            Timer = 0f;
+
+            camHolder.localPosition = Vector3.Lerp(camHolder.localPosition, startPos, Time.deltaTime * 8f);
+
+        }
+
+
+
+            {
+                RaycastHit hitinfo;
+            float TakedownRadius = 2.5f;
+            float ThickRadius = 0.5f;
+
+            Vector3 StartPoint = Camera.transform.position + (Camera.transform.forward * .5f);
+
+            if (Physics.SphereCast(StartPoint,ThickRadius,Camera.main.transform.forward, out hitinfo,TakedownRadius, Enemy_Layer))
+            {
+
+
+                EnemyAI enemy = hitinfo.collider.GetComponentInParent<EnemyAI>();
+
+
+                if (enemy != null)
+                {
+                    Vector3 DirectiontoPlayer = (transform.position - enemy.transform.position).normalized;
+                    float Angle = Vector3.Angle( enemy.transform.forward,DirectiontoPlayer);
+
+                    if (Angle > 100f )
+                    {
+
+                        if (!enemy.IsDead())
+                        {
+                            Debug.Log("Went into takedown area");
+                            Interactive_img.SetActive(true);
+                        }
+
+                        if (Input.GetKeyDown(KeyCode.E))
+                        {
+                           enemy.TakedownEnemy();
+                        }
+
+                    }
+                    
+                }
+
+            }
+            else Interactive_img.SetActive (false);
+
+        }
+
         Sprint();
-      //  GrapppleHook();
          
        
 
@@ -87,7 +167,7 @@ public class fpsmovement : MonoBehaviour
     void FixedUpdate()
     {
 
-       Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+      // Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         
         float z = Input.GetAxis("Vertical");
         float x = Input.GetAxis("Horizontal");
@@ -96,7 +176,7 @@ public class fpsmovement : MonoBehaviour
         mousey -= Input.GetAxis("Mouse Y") * mousesensitivity;
 
         mousey = Mathf.Clamp(mousey,-90f,40f);
-        transform.rotation = Quaternion.Euler(mousey,mousex,0f);
+        transform.rotation = Quaternion.Euler(0f, mousex ,0f);
 
         movedirection = transform.forward * z + transform.right * x;
 
@@ -112,7 +192,7 @@ public class fpsmovement : MonoBehaviour
 
        rb.linearVelocity = new Vector3(movedirection.x * Currentspeed , rb.linearVelocity.y, movedirection.z * Currentspeed );  
 
-       transform.rotation = Quaternion.Euler(mousey, mousex , CurrentTilt);
+       //transform.rotation = Quaternion.Euler(mousey, mousex , CurrentTilt);
 
         if (camHolder != null)
         {
@@ -124,55 +204,65 @@ public class fpsmovement : MonoBehaviour
             return;
 
         }
+
+        float horizontalinput = Input.GetAxis("Horizontal");
+        float verticalinput = Input.GetAxis("Vertical");
+        bool IsMoving = Mathf.Abs(horizontalinput) > .1f || Mathf.Abs(verticalinput) > .1f;
+
+        //    float Animtargetspeed = 0f;
+
+        //if (IsMoving)
+        //{
+        //    Animtargetspeed = (Targetspeed == Sprintspeed) ? 1f : 0.5f;
+        //}
+        //float currentAnimFloat = anim.GetFloat("Speed");
+        //float blendedSpeed = Mathf.Lerp(currentAnimFloat, Animtargetspeed, acceleration * Time.deltaTime);
+
+        //anim.SetFloat("Speed", blendedSpeed);
+
     }
 
 
-    public void GrapppleHook()
-    {
-        float t = ellapsedtime / Time_Taken;
-        ellapsedtime += Time.deltaTime;
-        if (Input.GetMouseButtonDown(0))
-        {
-            Ray GrappleRay = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-
-            if (Physics.Raycast(GrappleRay, out hit) && Physics.Raycast(camHolder.position,camHolder.forward,GrappleCheckLength,Wall_Layer))
-            {
-                Vector3 clickedPosition = hit.point;
-
-                transform.position = Vector3.Slerp(transform.position,clickedPosition,t);
-                Debug.Log(clickedPosition);
-            }
-                
-        }
-    }
 
 
-    private void Jump()
-        {
+    //private void Jump()
+    //    {
 
-         if (Wallrunscript != null && Wallrunscript.IsWallrunning)
-            return;
+    //     if (Wallrunscript != null && Wallrunscript.IsWallrunning)
+    //        return;
 
 
-        if (Physics.Raycast(Jumpchecktransform.position, Vector3.down, Jumpchecklength , Ground))
-            {
+    //    if (Physics.Raycast(Jumpchecktransform.position, Vector3.down, Jumpchecklength , Ground))
+    //        {
 
-                Debug.Log("Hitting Ground");
-                Canjump = false;
-                rb.AddForce(Vector3.up * jumpforce, ForceMode.Impulse);
-            }
+    //            Debug.Log("Hitting Ground");
+    //            Canjump = false;
+    //            rb.AddForce(Vector3.up * jumpforce, ForceMode.Impulse);
+    //        }
 
-            else
-            {
-                Canjump = true; 
-            }
-        }
+    //        else
+    //        {
+    //            Canjump = true; 
+    //        }
+    //    }
 
 
 
     void Sprint()
     {
+
+        if (Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            IsSprinting = !IsSprinting;
+        }
+
+        Targetspeed = IsSprinting ? Sprintspeed : walkspeed;
+
+        float targetIntensity = IsSprinting ? SprintVignette : 0f;
+
+        vignette.intensity.value = (Mathf.Lerp(vignette.intensity.value,targetIntensity, VignetteSpeed * Time.deltaTime));
+        
+        
         Targetspeed = Input.GetKey(KeyCode.LeftShift) ? Sprintspeed : walkspeed;
 
         Currentspeed = Mathf.Lerp(Currentspeed, Targetspeed, acceleration * Time.deltaTime);
@@ -184,8 +274,32 @@ public class fpsmovement : MonoBehaviour
     {
         Debug.DrawRay(camHolder.position, camHolder.forward * raylength, Color.red);
         Debug.DrawRay(Jumpchecktransform.position, Vector3.down * Jumpchecklength, Color.blue);
-        Debug.DrawRay(camHolder.position,camHolder.forward * GrappleCheckLength,Color.black);
 
     }
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.tag == "Ground")
+        {
+            print("hoooooooooo");
+
+            Canjump = true;
+        }
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.tag == "Ground")
+        {
+            Canjump = false;
+        }
+        
+    }
+
+
 }
+
+
+
+
+

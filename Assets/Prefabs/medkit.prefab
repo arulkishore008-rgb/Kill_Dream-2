@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7778091503214880479}
   - component: {fileID: 7773768926618051374}
   - component: {fileID: 3184588925839656966}
+  - component: {fileID: -1450866011937718853}
   m_Layer: 0
   m_Name: medkit
   m_TagString: Untagged
@@ -114,3 +115,16 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &-1450866011937718853
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4443132480661645338}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28c523b8ae810b24289a517ec958643b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BezierGrenade
+  flightDuration: 1.5

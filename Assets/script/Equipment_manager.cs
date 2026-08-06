@@ -1,66 +1,66 @@
-using UnityEditor;
-using UnityEngine;
-using static Interfaces;
+//using UnityEditor;
+//using UnityEngine;
+//using static Interfaces;
 
-public class Equipment_manager : MonoBehaviour
-{
-    public Transform WeaponHolder;
-    private GameObject CurrentWeapon;
-    public Iweapon CurrentWeaponScript;
-
-
+//public class Equipment_manager : MonoBehaviour
+//{
+//    public Transform WeaponHolder;
+//    private GameObject CurrentWeapon;
+//    public Iweapon CurrentWeaponScript;
 
 
-    void Update()
-    {
-        if (Input.GetMouseButtonDown(0))
-        {
-            if (CurrentWeaponScript != null)
-            {
-                CurrentWeaponScript.useweapon();
-            }
-        }
-
-        if (Input.GetKeyDown(KeyCode.X))
-        {
-            Unequip();
-        }
-    }
-    public void EquipItem(Items ItemtoEquip)
-    {
-
-        if (ItemtoEquip == null || ItemtoEquip.weapon == null )  return;
 
 
-        Unequip();
+//    void Update()
+//    {
+//        if (Input.GetMouseButtonDown(0))
+//        {
+//            if (CurrentWeaponScript != null)
+//            {
+//                CurrentWeaponScript.useweapon();
+//            }
+//        }
 
-        if (ItemtoEquip.weapon == null)
-        {
-            return;
-        }
+//        if (Input.GetKeyDown(KeyCode.X))
+//        {
+//            Unequip();
+//        }
+//    }
+//    public void EquipItem(Items ItemtoEquip)
+//    {
 
-        if (CurrentWeapon != null)
-        {
-            Destroy(CurrentWeapon);
-        }
+//        if (ItemtoEquip == null || ItemtoEquip.weapon == null )  return;
 
-        CurrentWeapon = Instantiate(ItemtoEquip.weapon, WeaponHolder.position, WeaponHolder.rotation);
 
-        CurrentWeapon.transform.SetParent(WeaponHolder);
+//        Unequip();
 
-        CurrentWeaponScript = CurrentWeapon.GetComponent<Iweapon>();
+//        if (ItemtoEquip.weapon == null)
+//        {
+//            return;
+//        }
 
-        Debug.Log("Equippped + " + ItemtoEquip.name);
+//        if (CurrentWeapon != null)
+//        {
+//            Destroy(CurrentWeapon);
+//        }
 
-    }
+//        CurrentWeapon = Instantiate(ItemtoEquip.weapon, WeaponHolder.position, WeaponHolder.rotation);
 
-   void Unequip()
-    {
-        if (CurrentWeapon != null)
-        {
-            Destroy(CurrentWeapon);
-            CurrentWeaponScript = null;
+//        CurrentWeapon.transform.SetParent(WeaponHolder);
 
-        }
-    }
-}
+//        CurrentWeaponScript = CurrentWeapon.GetComponent<Iweapon>();
+
+//        Debug.Log("Equippped + " + ItemtoEquip.name);
+        
+//    }
+
+//   public void Unequip()
+//    {
+//        if (CurrentWeapon != null)
+//        {
+//            Destroy(CurrentWeapon);
+//            CurrentWeaponScript = null;
+
+//        }
+//    }
+//}

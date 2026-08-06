@@ -4,8 +4,20 @@
 TagManager:
   serializedVersion: 3
   tags:
-  - bullet
+  - Wall
+  - Metal
+  - Blood
+  - Dirt
+  - Concrete
+  - ExplosiveBarrel
+  - Target
+  - GasTank
+  - Metal (Static)
+  - Wood (Static)
+  - Dirt (Static)
+  - Wood
   - Ground
+  - PlayerInteractivePoint
   layers:
   - Default
   - TransparentFX
@@ -13,16 +25,16 @@ TagManager:
   - 
   - Water
   - UI
+  - 
+  - 
+  - Wall
+  - Ground
   - Player
+  - Post Processing
+  - Post Processing Weapon
+  - Post Processing Scope
   - Enemies
-  - Wall_Layer
-  - Ground_Layer
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Projectile
   - 
   - 
   - 
@@ -45,10 +57,3 @@ TagManager:
     locked: 0
   m_RenderingLayers:
   - Default
-  - Light Layer 1
-  - Light Layer 2
-  - Light Layer 3
-  - Light Layer 4
-  - Light Layer 5
-  - Light Layer 6
-  - Light Layer 7

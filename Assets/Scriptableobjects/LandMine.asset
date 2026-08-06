@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6ef202949982f5499b5b5668815246d, type: 3}
+  m_Name: LandMine
+  m_EditorClassIdentifier: Assembly-CSharp::Items
+  Weapon_names: LandMine
+  weapon_Damage: 0
+  weapon_Range: 0
+  Prefab: {fileID: 5292362912814829778, guid: b96c7059f1654a242a5e7e8bccfec54e, type: 3}
+  IsStackable: 0
+  maxStacksize: 4
+  icon: {fileID: 21300000, guid: 658f8c4291feb3c45921cee3a500ddc2, type: 3}
+  IsThrowable: 0
+  handPrefab: {fileID: 5292362912814829778, guid: 4d1d94e92065dcd4a8384dc84ddc0758, type: 3}

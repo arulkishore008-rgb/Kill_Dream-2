@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Interfaces : MonoBehaviour
+public class Interfaces 
 {
    public interface Ishockable
     {
