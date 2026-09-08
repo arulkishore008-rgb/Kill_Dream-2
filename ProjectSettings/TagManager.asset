@@ -18,6 +18,7 @@ TagManager:
   - Wood
   - Ground
   - PlayerInteractivePoint
+  - Enemy
   layers:
   - Default
   - TransparentFX

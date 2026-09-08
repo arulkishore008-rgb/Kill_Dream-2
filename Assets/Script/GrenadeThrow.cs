@@ -13,22 +13,16 @@ public class GrenadeThrow : MonoBehaviour
     public float MinChargetime = .5f;
     public  float MaxChargetime;
     public static bool IsThrown = false;
-
-
-    
-
-
+    public LayerMask EnemyLayer;
 
     void Start()
     {
+
     }
 
     void Update()
     {
-
-
-
-        if (Input.GetMouseButton(1))
+        if (Input.GetKey(KeyCode.F))
         {
             Chargetime += Time.deltaTime;
 
@@ -42,7 +36,7 @@ public class GrenadeThrow : MonoBehaviour
 
         }
 
-        if (Input.GetMouseButtonUp(1) && CanThrow)
+        if (Input.GetKey(KeyCode.F) && CanThrow)
         {
                 Throwables();
                 Chargetime = 0f;
@@ -68,7 +62,6 @@ public class GrenadeThrow : MonoBehaviour
 
         Inventorynew.instance.ConsumeEquippedItem(1);
     }
-
 
 }
 

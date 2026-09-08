@@ -190,6 +190,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2993096830979144530}
   - component: {fileID: 372563451077209442}
+  - component: {fileID: -5295409701725726848}
   m_Layer: 0
   m_Name: Pistol_Hand
   m_TagString: Untagged
@@ -232,13 +233,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74f19af1e9adbc34d809d1ea00b53c24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::shootingscript
-  damage: 10
+  damage: 50
   range: 100
   Timetofire: 3
   firerate: 1
   hitforce: 100
-  SmokeEffect: {fileID: 1000013169864706, guid: e5a3d6da48298a0458c1990f58c27069, type: 3}
+  SmokeEffect: {fileID: 1000013169864706, guid: e5a3d6da48298a0458c1990f58c27069,
+    type: 3}
   SmokeTrans: {fileID: 8167046931093656100}
+  Animator: {fileID: -5295409701725726848}
+--- !u!95 &-5295409701725726848
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2522397453339105897}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: e5edf47bce9659749a5389a474687deb, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &3490797059020784169
 GameObject:
   m_ObjectHideFlags: 0

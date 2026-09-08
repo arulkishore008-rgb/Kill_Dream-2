@@ -480,7 +480,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.285, y: 1.894, z: -19.689}
-  m_LocalScale: {x: 6, y: 6, z: 6}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 5073489332422140603}
@@ -502,10 +502,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28c523b8ae810b24289a517ec958643b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Grenade
-  delay: 3
+  delay: 2
   Radius: 10
-  ExplosiveForce: 800
-  ExplosiveEffect: {fileID: 1000011797152326, guid: acf39d9f4addf294d93fa56fa373961b, type: 3}
+  ExplosiveForce: 2000
+  ExplosiveEffect: {fileID: 1000011797152326, guid: acf39d9f4addf294d93fa56fa373961b,
+    type: 3}
+  EnemyLayer:
+    serializedVersion: 2
+    m_Bits: 16384
 --- !u!23 &-2800526242917830981
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -531,7 +535,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 6271573414225017425, guid: e21c40d75d99ddd429924fad239e502a, type: 3}
+  - {fileID: 2100000, guid: d102225e99871b94b94e8d6c5bed12b1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

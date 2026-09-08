@@ -108,11 +108,11 @@ MonoBehaviour:
   throwForce: 20
   Chargetime: 0
   Countdown: 0
-  MinChargetime: 1
-  MaxChargetime: 3
+  MinChargetime: 0.1
+  MaxChargetime: 1
   CanThrow: 0
-  ProjectilePrerfab: {fileID: 3296853871780648755, guid: 98b1bf2a10a24f443934c430eb9f9b20, type: 3}
-  StartPoint: {x: 0, y: 0, z: 0}
+  ProjectilePrerfab: {fileID: 3296853871780648755, guid: 98b1bf2a10a24f443934c430eb9f9b20,
+    type: 3}
   thickRadius: 0.5
   meleeRange: 2.5
 --- !u!1 &6600611217434590139

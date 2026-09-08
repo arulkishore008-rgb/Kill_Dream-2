@@ -240,9 +240,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c25b489adc90e94d87a5446185ae9b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GrenadeThrow
-  ProjectilePrefab: {fileID: 6919837752021098982, guid: 2ad33db7f0a66df43b25c7e99c47d57d, type: 3}
-  delay: 3
-  Countdown: 0
+  ProjectilePrefab: {fileID: 6919837752021098982, guid: 2ad33db7f0a66df43b25c7e99c47d57d,
+    type: 3}
+  GrenadeRadius: 10
   throwForce: 20
   Chargetime: 0
+  MinChargetime: 0.5
   MaxChargetime: 4
+  EnemyLayer:
+    serializedVersion: 2
+    m_Bits: 0

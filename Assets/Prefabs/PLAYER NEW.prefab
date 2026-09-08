@@ -446,6 +446,7 @@ MonoBehaviour:
   globalvolume: {fileID: 0}
   SprintVignette: 0.3
   VignetteSpeed: 5
+  IsSprinting: 0
   camHolder: {fileID: 7031304238359135617}
   Maxtilt: 15
   Tiltspeed: 5
@@ -456,7 +457,7 @@ MonoBehaviour:
     m_Bits: 512
   Enemy_Layer:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 0
   bobSpeed: 6
   bobAmount: 0.07
   Timer: 0

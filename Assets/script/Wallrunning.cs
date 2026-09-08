@@ -46,6 +46,13 @@ public class Wallrunning : MonoBehaviour
     void Update()
     {
         Checkforwall();
+ 
+        if (IsWallrunning && Input.GetKeyDown(KeyCode.Space))
+        {
+            Walljump();
+            return;
+        }
+
         Statemachine();
     }
 
@@ -63,7 +70,6 @@ public class Wallrunning : MonoBehaviour
         wallright = Physics.Raycast(CamHolder.position, transform.right, out Isrightwallhit, Wallcheckdistance, Iswall);
 
     }
-
 
     void Statemachine()
     {
@@ -91,23 +97,19 @@ public class Wallrunning : MonoBehaviour
 
             }
 
-                if (Input.GetKeyDown(KeyCode.Space))
-                {
-                    Walljump();
-                }
+                //if (Input.GetKeyDown(KeyCode.Space))
+                //{
+                //    Walljump();
+                //}
 
                 if (Wallruntimer > 0)
                     Wallruntimer -= Time.deltaTime;
 
-                if (Wallruntimer <= 0 && IsWallrunning)
-                {
-                    exitingWall = true;
-                    exitingWallTimer = exitingWalltime;
-                }
-
-            
-
-
+            if (Wallruntimer <= 0 && IsWallrunning)
+            {
+                exitingWall = true;
+                exitingWallTimer = exitingWalltime;
+            }
         }
 
             else    // 3

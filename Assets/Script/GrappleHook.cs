@@ -23,29 +23,30 @@ public class GrappleHook : MonoBehaviour
     private float CamFOV;
     void Update()
     {
-        if (isFlying && !fpsmovement.Canjump)
+        if (isFlying)
         {
             FlyToTarget();
+            
             return;
         }
 
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetKeyDown(KeyCode.Q))
         {
             isCharging = true;
             chargeTime = 0f;
         }
 
-        if (Input.GetMouseButton(0) && isCharging)
+        if (Input.GetKey(KeyCode.Q) && isCharging)
         {           
             chargeTime += Time.deltaTime;
             chargeTime = Mathf.Clamp(chargeTime, 0f, maxChargeTime);
         }
 
-        if (Input.GetMouseButtonUp(0) && isCharging)
+        if (Input.GetKeyUp(KeyCode.Q) && isCharging)
         {
             isCharging = false;
             //Camera.main.fieldOfView = 80f;
-            if (chargeTime >= 0.2f)
+            if (chargeTime >= 0.1f)
             {
                 FireHook();
             }

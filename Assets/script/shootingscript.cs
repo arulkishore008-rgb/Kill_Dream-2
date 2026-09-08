@@ -9,35 +9,43 @@ public class shootingscript : MonoBehaviour
     public float firerate = 15f;
     public float hitforce = 60f;
 
-    public GameObject SmokeEffect;
-    public Transform SmokeTrans;
+   // public GameObject SmokeEffect;
+   // public Transform SmokeTrans;
+    public Animator Animator;
 
     void Start()
     {
         cam = Camera.main;
+        Animator = GetComponent<Animator>();
     }
 
     void Update()
     {
-        if (Input.GetMouseButton(0) && Time.time >= Timetofire) 
+        if (Input.GetMouseButtonDown(0)) 
         {
-            Timetofire = Time.time + 1 / firerate;
+            Animator.SetBool("shoot", true);
+            SoundManager.MakeNoise(transform.position, 50f, gameObject);
+
+           // Timetofire = Time.time + 1 / firerate;
             shoot();
         }
+
+        else  
+             Animator.SetBool("shoot", false);
     }
 
     void shoot()
     {
         RaycastHit hit;
 
-        GameObject smokeefx = Instantiate(SmokeEffect,SmokeTrans.position,cam.transform.rotation);
-        Destroy(smokeefx,1f);
+       // GameObject smokeefx = Instantiate(SmokeEffect,SmokeTrans.position,cam.transform.rotation);
+       // Destroy(smokeefx,1f);
 
        if (Physics.Raycast(cam.transform.position, cam.transform.forward, out hit, range))
         {
-            Debug.Log(hit.transform.name);
+            //Debug.Log(hit.transform.name);
 
-            Target target = hit.transform.GetComponent<Target>();
+            EnemyAI target = hit.transform.GetComponent<EnemyAI>();
 
             if (target != null)
             {

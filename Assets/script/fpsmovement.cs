@@ -1,9 +1,11 @@
 using System.ComponentModel;
 using Unity.Collections;
+using Unity.Services.Analytics;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.PostProcessing;
 using UnityEngine.Rendering.Universal;
 using static Interfaces;
 
@@ -34,9 +36,10 @@ public class fpsmovement : MonoBehaviour
     Vector3 movedirection;
     public Transform Jumpchecktransform;
     public float Jumpchecklength;
+    private int JumpCount;
 
     public Volume globalvolume;
-    private Vignette vignette;
+    private UnityEngine.Rendering.Universal.Vignette vignette;
     public float SprintVignette;
     public float VignetteSpeed;
     public bool IsSprinting;
@@ -55,6 +58,7 @@ public class fpsmovement : MonoBehaviour
 
     public LayerMask Ground;
     public LayerMask Enemy_Layer;
+    private float TakedownTimer = 1f;
 
 
     [Header("Camera Movements")]
@@ -62,13 +66,22 @@ public class fpsmovement : MonoBehaviour
     Vector3 startPos;
     public float bobSpeed;
     public float bobAmount;
+    public float xbobAmount;
     public float Timer;
+    public float CurrentFOV = 60f;
+    public float SprintFOV = 80f;
+    public float SprintFOV_Timer = 3f;
+    public float JumpshakeDuration;
+    public float CameraShakeTimer;
+    public float JumpShakeAmount;
+    public float JumpShakeSpeed;
+    bool IsShaking = false;
 
+    [Header("Health")]
+
+    public float CurrentHealth = 0f;
 
     // private Animator anim;
-
-
-
 
     void Start()
     {
@@ -82,28 +95,43 @@ public class fpsmovement : MonoBehaviour
 
         if (globalvolume == null) return;
 
-        globalvolume.profile.TryGet<Vignette>(out vignette);
+        globalvolume.profile.TryGet<UnityEngine.Rendering.Universal.Vignette>(out vignette);
+        
+
+        
         Interactive_img.SetActive(false);
 
     }
 
     void Update()
     {
-
-        if (Input.GetKeyDown(KeyCode.Space) && Canjump)  // JUMP
+        Canjump = Physics.Raycast(Jumpchecktransform.position, Vector3.down, Jumpchecklength, Ground);
+        if (Canjump)
         {
-            if (!Wallrunscript.IsWallrunning)
+            JumpCount = 0;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space) )  // JUMP
+        {
+            if (!Wallrunscript.IsWallrunning )
             {
-                rb.AddForce(Vector3.up * jumpforce , ForceMode.Impulse);
+                JumpCount++;
+
+                if (JumpCount < 2f)
+                {
+                    rb.AddForce(Vector3.up * jumpforce , ForceMode.Impulse);
+
+                }
             }
 
         }
 
-        if (Input.GetAxis("Vertical") > .1f)
+        if (Input.GetAxis("Vertical") > .1f || Input.GetAxis("Horizontal") > .1f || Input.GetAxis("Vertical") < -.1f  || Input.GetAxis("Horizontal") < -.1f)
         {
             Timer += Time.deltaTime * bobSpeed;
             float y = Mathf.Sin(Timer) * bobAmount;
-            camHolder.localPosition = startPos + new Vector3(0f, y, 0f);
+            float xbob = Mathf.Sin(Timer) * xbobAmount;
+            camHolder.localPosition = startPos + new Vector3(xbob, y, 0f);
 
         }
         else
@@ -114,10 +142,39 @@ public class fpsmovement : MonoBehaviour
 
         }
 
+        float z = Input.GetAxis("Vertical");
+        float x = Input.GetAxis("Horizontal");
 
+        movedirection = transform.forward * z + transform.right * x;
 
-            {
-                RaycastHit hitinfo;
+        float TargetTilt = 0f;
+
+        if (Wallrunscript != null && Wallrunscript.IsWallrunning)
+        {
+            if (Wallrunscript.wallleft) TargetTilt = -Maxtilt;
+
+            else if (Wallrunscript.wallright) TargetTilt = Maxtilt;
+        }
+
+        CurrentTilt = Mathf.Lerp(CurrentTilt, TargetTilt, Targetspeed * Time.deltaTime);
+
+         rb.linearVelocity = new Vector3(movedirection.x * Currentspeed, rb.linearVelocity.y, movedirection.z * Currentspeed);
+
+        transform.rotation = Quaternion.Euler(mousey, mousex, CurrentTilt);
+
+        if (camHolder != null)
+        {
+            camHolder.localRotation = Quaternion.Euler(mousey, 0f, CurrentTilt);
+        }
+
+        if (Wallrunscript != null && Wallrunscript.IsWallrunning && Wallrunscript.exitingWall)
+        {
+            return;
+
+        }
+
+        {
+            RaycastHit hitinfo;
             float TakedownRadius = 2.5f;
             float ThickRadius = 0.5f;
 
@@ -125,7 +182,7 @@ public class fpsmovement : MonoBehaviour
 
             if (Physics.SphereCast(StartPoint,ThickRadius,Camera.main.transform.forward, out hitinfo,TakedownRadius, Enemy_Layer))
             {
-
+                TakedownTimer -= Time.deltaTime;
 
                 EnemyAI enemy = hitinfo.collider.GetComponentInParent<EnemyAI>();
 
@@ -135,9 +192,8 @@ public class fpsmovement : MonoBehaviour
                     Vector3 DirectiontoPlayer = (transform.position - enemy.transform.position).normalized;
                     float Angle = Vector3.Angle( enemy.transform.forward,DirectiontoPlayer);
 
-                    if (Angle > 100f )
+                    if (Angle > 100f)
                     {
-
                         if (!enemy.IsDead())
                         {
                             Debug.Log("Went into takedown area");
@@ -159,66 +215,31 @@ public class fpsmovement : MonoBehaviour
         }
 
         Sprint();
-         
-       
 
+        UpdateCameraShake();
     }
 
-    void FixedUpdate()
+    void LateUpdate()
     {
 
-      // Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        
-        float z = Input.GetAxis("Vertical");
-        float x = Input.GetAxis("Horizontal");
 
         mousex += Input.GetAxis("Mouse X") * mousesensitivity;
         mousey -= Input.GetAxis("Mouse Y") * mousesensitivity;
 
-        mousey = Mathf.Clamp(mousey,-90f,40f);
-        transform.rotation = Quaternion.Euler(0f, mousex ,0f);
+        mousey = Mathf.Clamp(mousey, -60f, 20f);
+        transform.rotation = Quaternion.Euler(0f, mousex, 0f);
 
-        movedirection = transform.forward * z + transform.right * x;
 
-        float TargetTilt = 0f;
+        // Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
-        if (Wallrunscript != null && Wallrunscript.IsWallrunning)
-        {
-            if(Wallrunscript.wallleft) TargetTilt = -Maxtilt;
-            else if (Wallrunscript.wallright) TargetTilt = Maxtilt;
-        }
-
-        CurrentTilt = Mathf.Lerp(CurrentTilt, TargetTilt , Targetspeed * Time.deltaTime);
-
-       rb.linearVelocity = new Vector3(movedirection.x * Currentspeed , rb.linearVelocity.y, movedirection.z * Currentspeed );  
-
-       //transform.rotation = Quaternion.Euler(mousey, mousex , CurrentTilt);
-
-        if (camHolder != null)
-        {
-            camHolder.localRotation = Quaternion.Euler(mousey, 0f, CurrentTilt);
-        }
-
-        if (Wallrunscript != null && Wallrunscript.IsWallrunning && Wallrunscript.exitingWall)
-        {
-            return;
-
-        }
-
-        float horizontalinput = Input.GetAxis("Horizontal");
-        float verticalinput = Input.GetAxis("Vertical");
-        bool IsMoving = Mathf.Abs(horizontalinput) > .1f || Mathf.Abs(verticalinput) > .1f;
-
-        //    float Animtargetspeed = 0f;
+        //float horizontalinput = Input.GetAxis("Horizontal");
+        //float verticalinput = Input.GetAxis("Vertical");
+        //bool IsMoving = Mathf.Abs(horizontalinput) > .1f || Mathf.Abs(verticalinput) > .1f;
 
         //if (IsMoving)
         //{
-        //    Animtargetspeed = (Targetspeed == Sprintspeed) ? 1f : 0.5f;
         //}
-        //float currentAnimFloat = anim.GetFloat("Speed");
-        //float blendedSpeed = Mathf.Lerp(currentAnimFloat, Animtargetspeed, acceleration * Time.deltaTime);
 
-        //anim.SetFloat("Speed", blendedSpeed);
 
     }
 
@@ -251,23 +272,41 @@ public class fpsmovement : MonoBehaviour
     void Sprint()
     {
 
-        if (Input.GetKeyDown(KeyCode.LeftShift))
-        {
-            IsSprinting = !IsSprinting;
-        }
+        IsSprinting = Input.GetKey(KeyCode.LeftShift) && Input.GetAxis("Vertical") > .1f;
 
         Targetspeed = IsSprinting ? Sprintspeed : walkspeed;
 
         float targetIntensity = IsSprinting ? SprintVignette : 0f;
 
-        vignette.intensity.value = (Mathf.Lerp(vignette.intensity.value,targetIntensity, VignetteSpeed * Time.deltaTime));
-        
-        
-        Targetspeed = Input.GetKey(KeyCode.LeftShift) ? Sprintspeed : walkspeed;
-
+        float targetFOV = IsSprinting ? SprintFOV : CurrentFOV;
+        vignette.color.value = Color.gray;
         Currentspeed = Mathf.Lerp(Currentspeed, Targetspeed, acceleration * Time.deltaTime);
+        vignette.intensity.value = (Mathf.Lerp(vignette.intensity.value,targetIntensity, VignetteSpeed * Time.deltaTime));
+        Camera.main.fieldOfView  = Mathf.Lerp(Camera.main.fieldOfView, targetFOV, SprintFOV_Timer * Time.deltaTime);
+
+        if (IsSprinting && Currentspeed > 0.1f)
+        {
+           SoundManager.MakeNoise(transform.position, 5f, gameObject);
+        }
         
 
+    }
+
+    private void UpdateCameraShake()
+    {
+        if (!IsShaking) return;
+
+        CameraShakeTimer += Time.deltaTime;
+        float shake = Mathf.Sin(CameraShakeTimer * JumpShakeSpeed) * JumpShakeAmount;
+        camHolder.localPosition = startPos + new Vector3(0f, shake, shake);
+
+        if (CameraShakeTimer >= JumpshakeDuration)
+        {
+            IsShaking = false;
+            CameraShakeTimer = 0f;
+
+            camHolder.localPosition = startPos;
+        }
     }
 
     private void OnDrawGizmos()
@@ -277,23 +316,31 @@ public class fpsmovement : MonoBehaviour
 
     }
 
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.tag == "Ground")
-        {
-            print("hoooooooooo");
+    //private void OnCollisionEnter(Collision collision)
+    //{
+    //    if (collision.gameObject.tag == "Ground")
+    //    {
+    //            Canjump = true;
 
-            Canjump = true;
-        }
-    }
+    //            CameraShakeTimer = 0f;
+    //            IsShaking = true;
 
-    private void OnCollisionExit(Collision collision)
-    {
-        if (collision.gameObject.tag == "Ground")
-        {
-            Canjump = false;
-        }
+
+    //    }
+    //}
+
+    //private void OnCollisionExit(Collision collision)
+    //{
+    //    if (collision.gameObject.tag == "Ground")
+    //    {
+    //        Canjump = false;
+    //    }
         
+    //}
+
+    public void TakeDamage()
+    {
+       
     }
 
 

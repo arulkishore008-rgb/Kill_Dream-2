@@ -18,12 +18,18 @@ public class Target : MonoBehaviour
         health -= amount;
         if (health <= 0f)
         {
-            die();
+            //die();
         }
     }
     void die ()
     {
         Destroy(gameObject);
     }
+
+    void Deathanimation()
+    {
+        
+    }
+
 
 }
