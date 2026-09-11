@@ -37,7 +37,7 @@ public class GrappleHook : MonoBehaviour
     {
         if (lr != null)
         {
-            lr.positionCount = 0;
+            lr.enabled = false;
         }
     }
     void Update()
@@ -45,7 +45,6 @@ public class GrappleHook : MonoBehaviour
         if (isFlying)
         {
             FlyToTarget();
-            DrawRope();
             
             return;
         }
@@ -73,6 +72,15 @@ public class GrappleHook : MonoBehaviour
         }
     }
 
+    void LateUpdate()
+    {
+        if (isFlying && lr != null && lr.enabled)
+        {
+            lr.SetPosition(0, GunTip != null ? GunTip.position : transform.position);
+            lr.SetPosition(1, grappleTarget);
+        }
+    }
+
     void FireHook()
     {
         Ray ray = new Ray(camHolder.position, camHolder.forward);
@@ -85,8 +93,16 @@ public class GrappleHook : MonoBehaviour
             flyDuration = distance / flySpeed;
             flyProgress = 0f;
 
-            isFlying = true; 
-    
+            isFlying = true;
+
+            if (lr != null)
+            {
+                lr.positionCount = 2;
+                lr.SetPosition(0, GunTip != null ? GunTip.position : transform.position);
+                lr.SetPosition(1, grappleTarget);
+                lr.enabled = true;
+            }
+
             if (playerMovement != null) playerMovement.enabled = false;
         }
         else
@@ -108,32 +124,24 @@ public class GrappleHook : MonoBehaviour
 
         if (t >= 1f)
         {
-            isFlying = false;
-
-            if (lr != null)
-            {
-                lr.positionCount = 0;
-            }
-
-            float Chargepercent = chargeTime / maxChargeTime;
-            Camera.main.fieldOfView = Mathf.Lerp(CurrentFOV,MaxFOV,Chargepercent);
-
-            if (playerMovement != null) playerMovement.enabled = true;
-
-            Debug.Log("Grapple Complete!");
-        
+          StopGrapple();        
         }
     }
 
 
-    void DrawRope()
+    void StopGrapple()
     {
-        if (lr == null) return;
-        lr.positionCount = 2;
+        isFlying = false;
 
-        Vector3 origin = (GunTip != null) ? GunTip.position : transform.position;
-        lr.SetPosition(0, origin);
-        lr.SetPosition(1, grappleTarget);
+        // Turn off line visual upon arrival
+        if (lr != null)
+        {
+            lr.enabled = false;
+        }
+
+        float chargePercent = chargeTime / maxChargeTime;
+        Camera.main.fieldOfView = Mathf.Lerp(CurrentFOV, MaxFOV, chargePercent);
+
+        if (playerMovement != null) playerMovement.enabled = true;
     }
-
 }

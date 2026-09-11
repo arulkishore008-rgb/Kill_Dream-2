@@ -106,18 +106,11 @@ public class fpsmovement : MonoBehaviour
     void Update()
     {
         Canjump = Physics.Raycast(Jumpchecktransform.position, Vector3.down, Jumpchecklength, Ground);
-        if (Canjump)
-        {
-            JumpCount = 0;
-        }
 
         if (Input.GetKeyDown(KeyCode.Space) )  // JUMP
         {
-            if (!Wallrunscript.IsWallrunning )
+            if (!Wallrunscript.IsWallrunning && Canjump)
             {
-                JumpCount++;
-
-                if (JumpCount < 2f)
                 {
                     rb.AddForce(Vector3.up * jumpforce , ForceMode.Impulse);
 
