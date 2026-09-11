@@ -107,7 +107,7 @@ public class GrappleHook : MonoBehaviour
         }
         else
         {
-            Debug.Log("Grapple missed! Nothing in range.");
+            Debug.Log("Grapple missedddddd Nothing in range");
         }
     }
 

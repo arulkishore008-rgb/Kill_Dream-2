@@ -88,7 +88,7 @@ public class Wallrunning : MonoBehaviour
               exitingWall = false;
              
     }
-
+        
         if ((wallleft || wallright ) && verticalinput > 0f && Aboveground() && !exitingWall)
         {
             if (!IsWallrunning)  // 2

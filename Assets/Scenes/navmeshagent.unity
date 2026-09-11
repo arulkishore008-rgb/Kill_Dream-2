@@ -8825,12 +8825,21 @@ LineRenderer:
   - {x: 0, y: 0, z: 1}
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 1.0397584
+    widthMultiplier: 0.03
     widthCurve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
         time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
         value: 1
         inSlope: 0
         outSlope: 0
@@ -8843,10 +8852,10 @@ LineRenderer:
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 1, g: 1, b: 1, a: 1}
+      key0: {r: 0, g: 0, b: 0, a: 1}
       key1: {r: 0.08679241, g: 0.08679241, b: 0.08679241, a: 1}
       key2: {r: 0.15983129, g: 0.15983129, b: 0.15983129, a: 0}
-      key3: {r: 1, g: 1, b: 1, a: 0}
+      key3: {r: 0.20754719, g: 0.16407976, b: 0.16407976, a: 0}
       key4: {r: 0, g: 0, b: 0, a: 0}
       key5: {r: 0, g: 0, b: 0, a: 0}
       key6: {r: 0, g: 0, b: 0, a: 0}
@@ -8854,8 +8863,8 @@ LineRenderer:
       ctime0: 3315
       ctime1: 18735
       ctime2: 50038
-      ctime3: 65535
-      ctime4: 0
+      ctime3: 58519
+      ctime4: 65535
       ctime5: 0
       ctime6: 0
       ctime7: 0
@@ -8869,10 +8878,10 @@ LineRenderer:
       atime7: 0
       m_Mode: 0
       m_ColorSpace: 0
-      m_NumColorKeys: 4
+      m_NumColorKeys: 5
       m_NumAlphaKeys: 2
     numCornerVertices: 0
-    numCapVertices: 0
+    numCapVertices: 4
     alignment: 0
     textureMode: 0
     textureScale: {x: 1, y: 1}
@@ -9358,6 +9367,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8296640592339382812, guid: 03b03092355334b48a57786926dce70d,
         type: 3}
+      propertyPath: m_Mass
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8296640592339382812, guid: 03b03092355334b48a57786926dce70d,
+        type: 3}
       propertyPath: m_Interpolate
       value: 0
       objectReference: {fileID: 0}
@@ -9409,12 +9423,12 @@ PrefabInstance:
     - target: {fileID: 8547072744628349181, guid: 03b03092355334b48a57786926dce70d,
         type: 3}
       propertyPath: WallJumpupForce
-      value: 5
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 8547072744628349181, guid: 03b03092355334b48a57786926dce70d,
         type: 3}
       propertyPath: WallJumpsideForce
-      value: 15
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 8547072744628349181, guid: 03b03092355334b48a57786926dce70d,
         type: 3}
