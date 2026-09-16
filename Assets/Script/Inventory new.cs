@@ -28,6 +28,24 @@ public class Inventorynew : MonoBehaviour
     private List<Inventoryslot> AllSlots = new List<Inventoryslot>();
 
 
+    public List<Items> InventoryList = new List<Items>();
+    public Transform slotContainer;
+    public GameObject slotPrefab;
+
+    public void AddItemToInventory(Items newItem)
+    {
+        InventoryList.Add(newItem);
+
+        GameObject newSlot = Instantiate(slotPrefab,slotContainer);
+        
+        Image slotIcon = newSlot.transform.Find("Icon").GetComponent<Image>();
+        if (slotIcon != null)
+        {
+            slotIcon.sprite = newItem.icon;
+            slotIcon.enabled = true;
+        }
+        Debug.Log($"Added {newItem.Weapon_names} to inventory UI!");
+    }
 
     private void Awake()
     {

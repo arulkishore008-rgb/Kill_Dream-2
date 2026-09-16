@@ -106,18 +106,11 @@ public class fpsmovement : MonoBehaviour
     void Update()
     {
         Canjump = Physics.Raycast(Jumpchecktransform.position, Vector3.down, Jumpchecklength, Ground);
-        if (Canjump)
-        {
-            JumpCount = 0;
-        }
 
-        if (Input.GetKeyDown(KeyCode.Space) )  // JUMP
+        if (Input.GetKeyDown(KeyCode.Space) && Canjump)  // JUMP
         {
-            if (!Wallrunscript.IsWallrunning )
+            //if (!Wallrunscript.IsWallrunning )
             {
-                JumpCount++;
-
-                if (JumpCount < 2f)
                 {
                     rb.AddForce(Vector3.up * jumpforce , ForceMode.Impulse);
 
@@ -312,7 +305,7 @@ public class fpsmovement : MonoBehaviour
     private void OnDrawGizmos()
     {
         Debug.DrawRay(camHolder.position, camHolder.forward * raylength, Color.red);
-        Debug.DrawRay(Jumpchecktransform.position, Vector3.down * Jumpchecklength, Color.blue);
+        Debug.DrawRay(Jumpchecktransform.position, Vector3.down * Jumpchecklength, Color.white);
 
     }
 
