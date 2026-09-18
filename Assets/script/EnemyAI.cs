@@ -193,7 +193,8 @@ public class EnemyAI : MonoBehaviour , Ishockable
 
             case Enemystate.Processing:
                 NavMeshAgent.isStopped = true;
-                animator.SetBool("Isidle", true);
+                animator.SetBool("Isidle", false);
+                animator.SetBool("IsProcessing", true);
                 animator.SetBool("Iswalking", false);
                 animator.SetBool("IsChasing", false);
 
