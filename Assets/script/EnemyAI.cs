@@ -159,12 +159,14 @@ public class EnemyAI : MonoBehaviour , Ishockable
                 if (is_Waiting)
                 {
                     animator.SetBool("Isidle", true);
+                    animator.SetBool("IsProcessing", false);
                     animator.SetBool("Iswalking", false);
                     animator.SetBool("IsChasing", false);
                 }
                 else
                 {
                     animator.SetBool("Iswalking", true);
+                    animator.SetBool("IsProcessing", false);
                     animator.SetBool("IsChasing", false);
                     animator.SetBool("Isidle", false);
 
@@ -173,7 +175,8 @@ public class EnemyAI : MonoBehaviour , Ishockable
 
                 if (seesPlayer)
                 {
-                    animator.SetBool("Isidle", true);
+                    animator.SetBool("IsProcessing", true);
+                    animator.SetBool("Isidle", false);
                     animator.SetBool("Iswalking", false);
                     ProcessingTimer = 0f;
                     SightlostTimer = 0f;
@@ -193,8 +196,8 @@ public class EnemyAI : MonoBehaviour , Ishockable
 
             case Enemystate.Processing:
                 NavMeshAgent.isStopped = true;
-                animator.SetBool("Isidle", false);
                 animator.SetBool("IsProcessing", true);
+                animator.SetBool("Isidle", false);
                 animator.SetBool("Iswalking", false);
                 animator.SetBool("IsChasing", false);
 
@@ -247,7 +250,7 @@ public class EnemyAI : MonoBehaviour , Ishockable
 
                 NavMeshAgent.isStopped = false;
 
-
+                animator.SetBool("IsProcessing", false);
                 animator.SetBool("Iswalking", true);
                 animator.SetBool("IsChasing", false);
                 animator.SetBool("Isidle", false);
@@ -287,6 +290,7 @@ public class EnemyAI : MonoBehaviour , Ishockable
                 NavMeshAgent.isStopped = true;
 
                 animator.SetBool("Iswalking", false);
+                animator.SetBool("IsProcessing", false);
                 animator.SetBool("IsChasing", false);
                 animator.SetBool("Isidle", true);
 
@@ -323,6 +327,7 @@ public class EnemyAI : MonoBehaviour , Ishockable
 
             case Enemystate.Following:
                 animator.SetBool("IsChasing", true);
+                animator.SetBool("IsProcessing", false);
                 animator.SetBool("Iswalking", false);
                 animator.SetBool("Isidle", false);
 
@@ -350,6 +355,8 @@ public class EnemyAI : MonoBehaviour , Ishockable
 
                 NavMeshAgent.isStopped = true;
                 animator.SetBool("IsChasing", false);
+                animator.SetBool("IsProcessing", false);
+
 
                 if (player != null)
                 {
