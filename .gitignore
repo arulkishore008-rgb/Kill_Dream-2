@@ -104,3 +104,6 @@ InitTestScene*.unity*
 
 # Auto-generated cache in Assets folder
 /[Aa]ssets/[Ss]ceneDependencyCache*
+# Unity generated lighting data
+Assets/Scenes/animation/Lightmap-*_comp_light.exr
+Assets/Blockout/Examples/FPS/LightingData.asset
