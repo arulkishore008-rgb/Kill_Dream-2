@@ -7524,7 +7524,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1934997279
 Transform:
   m_ObjectHideFlags: 0
@@ -8806,7 +8806,8 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1564347829}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 7945486945842724076, guid: 03b03092355334b48a57786926dce70d, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 03b03092355334b48a57786926dce70d, type: 3}
@@ -8922,12 +8923,11 @@ PrefabInstance:
         type: 3}
       propertyPath: Helditem
       value: 
-      objectReference: {fileID: 11400000, guid: ada76bd1686184e46b14a9d0015ee637,
-        type: 2}
+      objectReference: {fileID: 0}
     - target: {fileID: 2203224137271513701, guid: 3818b58ef254bd74cbb3ee022d1a5249,
         type: 3}
       propertyPath: itemAmount
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5699448655089044706, guid: 3818b58ef254bd74cbb3ee022d1a5249,
         type: 3}
