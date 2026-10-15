@@ -219,7 +219,7 @@ public class fpsmovement : MonoBehaviour
         mousex += Input.GetAxis("Mouse X") * mousesensitivity;
         mousey -= Input.GetAxis("Mouse Y") * mousesensitivity;
 
-        mousey = Mathf.Clamp(mousey, -60f, 20f);
+        mousey = Mathf.Clamp(mousey, -60f, 28f);
         transform.rotation = Quaternion.Euler(0f, mousex, 0f);
 
 

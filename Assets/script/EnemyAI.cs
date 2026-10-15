@@ -103,7 +103,7 @@ public class EnemyAI : MonoBehaviour , Ishockable
         NavMeshAgent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
     }
-    void Start()
+    public void Start()
     {
         GoTonextpatrolpoint();
          PlayerCam = Camera.main;
@@ -304,7 +304,7 @@ public class EnemyAI : MonoBehaviour , Ishockable
                     break;
                 }
 
-
+ 
                 if (heardNoise)
                 {
                     heardNoise = false;

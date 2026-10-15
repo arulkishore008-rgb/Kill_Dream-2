@@ -1,15 +1,56 @@
 using UnityEngine;
+using UnityEngine.AI;
 
-public class EnemyDrone : EnemyAI
+public class DroneEnemyAI : MonoBehaviour
 {
-    [SerializeField] private float ds;
-    [SerializeField] private float ss;
-    [SerializeField] private float sd;
+    private NavMeshAgent agent;
+    public Transform[] Patrolpoints;
+    private int currentIndex = 0;
+    [SerializeField] private float droneSpeed = 10.0f;
 
-    public Transform[] patrolPoints;
+    [SerializeField] private float RotateSpeed = 5f;
+    [SerializeField] private float waitTime = 2f;
+    private float waitTimer = 0f;
+    private bool isWaiting = false;
 
-    public override void patrolling()
+
+
+    private void Update()
     {
-        base.patrolling();
+        DronePatrol();  
+    }
+    void DronePatrol()
+    {
+        if (Patrolpoints.Length == 0) return;
+
+
+        if (isWaiting)
+        {
+            waitTimer += Time.deltaTime;
+            if (waitTimer >= waitTime)
+            {
+                isWaiting = false;
+                waitTimer = 0f;
+                currentIndex = (currentIndex + 1) % Patrolpoints.Length;
+            }
+            return; 
+        }
+
+        Transform targetPoint = Patrolpoints[currentIndex];
+
+        Vector3 direction = (targetPoint.position - transform.position).normalized;
+        if (direction != Vector3.zero)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, RotateSpeed * Time.deltaTime);
+        }
+
+        transform.position = Vector3.MoveTowards(transform.position, Patrolpoints[currentIndex].position,droneSpeed * Time.deltaTime);
+
+        if (Vector3.Distance(transform.position, Patrolpoints[currentIndex].position) < .1f)
+        {
+            isWaiting = true;
+        }
+        
     }
 }
