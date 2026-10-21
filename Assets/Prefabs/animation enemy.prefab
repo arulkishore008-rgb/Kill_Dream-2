@@ -2149,6 +2149,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 932216388924440290}
+  - component: {fileID: 8136404841354884447}
   - component: {fileID: 7875484917083455504}
   m_Layer: 0
   m_Name: animation enemy
@@ -2174,6 +2175,14 @@ Transform:
   - {fileID: 2286464101170606957}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &8136404841354884447
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7834940315434947771}
+  m_Mesh: {fileID: 659574199126064034, guid: 387302d88624c374e8aa72f9c73d78b0, type: 3}
 --- !u!95 &7875484917083455504
 Animator:
   serializedVersion: 7

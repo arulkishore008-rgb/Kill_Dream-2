@@ -105,6 +105,20 @@ public class fpsmovement : MonoBehaviour
 
     void Update()
     {
+
+        if (IsSprinting)
+        {
+            bobSpeed = 12f;
+            bobAmount = .08f;
+
+        }
+        else
+        {
+            bobSpeed = 7f;
+            bobAmount = .05f;
+
+        }
+
         Canjump = Physics.Raycast(Jumpchecktransform.position, Vector3.down, Jumpchecklength, Ground);
 
         if (Input.GetKeyDown(KeyCode.Space) && Canjump)  // JUMP
@@ -265,7 +279,7 @@ public class fpsmovement : MonoBehaviour
     void Sprint()
     {
 
-        IsSprinting = Input.GetKey(KeyCode.LeftShift) && Input.GetAxis("Vertical") > .1f;
+        IsSprinting = Input.GetKey(KeyCode.LeftShift) && Input.GetAxis("Vertical") > .5f;
 
         Targetspeed = IsSprinting ? Sprintspeed : walkspeed;
 

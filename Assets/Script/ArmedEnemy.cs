@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Rendering;
 
-public class ArmedEnemy : EnemyAI 
+public class ArmedEnemy : MonoBehaviour 
 {
     public enum ArmedEnemyState
     {
@@ -76,20 +76,17 @@ public class ArmedEnemy : EnemyAI
     }
 
 
-    public override void Update()
+    public void Update()
     {
         StateMachine();
     }
-    public override void Following()
+    public  void Following()
     {
-        base.Following();
     }
 
-    public override void StateMachine()
+    public void StateMachine()
     {
-        base.StateMachine();
 
-        if(IsDead()) return;
 
         switch (CombatState)
         {
@@ -98,7 +95,7 @@ public class ArmedEnemy : EnemyAI
                 break;
 
             case ArmedEnemyState.Combat:
-                combatState();
+              //  combatState();
                 break;
             
             case ArmedEnemyState.Reposition:
@@ -106,7 +103,7 @@ public class ArmedEnemy : EnemyAI
                 break;
 
             case ArmedEnemyState.SeekCover:
-                SeekCoverState(); 
+               // SeekCoverState(); 
                 break;
 
             case ArmedEnemyState.TakeCover:
@@ -125,15 +122,6 @@ public class ArmedEnemy : EnemyAI
     }
     public void AlertState()
     {
-        if (player == null)
-        {
-            return;
-        }
-
-        Agent.isStopped = true;
-
-        animator.SetBool("Iswalking", false);
-        animator.SetBool("Isidle", false);
 
         FacePlayer();
 
@@ -144,70 +132,61 @@ public class ArmedEnemy : EnemyAI
             changeCombatState(ArmedEnemyState.Combat);
         }
     }
-     public void combatState()
-     {
-        if (player == null) return;
+     //public void combatState()
+     //{
+     //   FacePlayer();
 
-        Agent.isStopped = true;
+     // //  float distance = Vector3.Distance(transform.position, player.position);
 
-        animator.SetBool("IsWalking", false);
-        animator.SetBool("Isidle", false);
+     //   //if (CanseePlayer())
+     //   //{
+     //   //    lastKnownPlayerPosition = player.position;
+     //   //}
+     //   else
+     //   {
+     //       changeCombatState(ArmedEnemyState.Search);
+     //       return;
+     //   }
 
-        FacePlayer();
+     //   //if (distance > CombatRange)
+     //   //{
+     //   //    ClearCombatState();
 
-        float distance = Vector3.Distance(transform.position, player.position);
+     //   //    return;
+     //   //}
 
-        if (CanseePlayer())
-        {
-            lastKnownPlayerPosition = player.position;
-        }
-        else
-        {
-            changeCombatState(ArmedEnemyState.Search);
-            return;
-        }
+     //   if (CurrentHealth <= lowHealthThreshold)
+     //   {
+     //       changeCombatState(ArmedEnemyState.SeekCover);
+     //       return;
+     //   }
 
-        if (distance > CombatRange)
-        {
-            ClearCombatState();
+     //       HandleShooting();
 
-            return;
-        }
+     //   if (decisionTimer >= DecisionInterval)
+     //   {
+     //       decisionTimer = 0f;
 
-        if (CurrentHealth <= lowHealthThreshold)
-        {
-            changeCombatState(ArmedEnemyState.SeekCover);
-            return;
-        }
+     //       float decision = Random.value;
 
-            HandleShooting();
+     //       //if (distance < MinimumCombatDistance)
+     //       //{
+     //       //    CalculateRepositionTarget();
+     //       //    changeCombatState(ArmedEnemyState.Reposition);
 
-        if (decisionTimer >= DecisionInterval)
-        {
-            decisionTimer = 0f;
-
-            float decision = Random.value;
-
-            if (distance < MinimumCombatDistance)
-            {
-                CalculateRepositionTarget();
-                changeCombatState(ArmedEnemyState.Reposition);
-
-            }
-            else if (decision < 0.35f)
-            {
-                CalculateRepositionTarget();
-                changeCombatState(ArmedEnemyState.Reposition);
-            }
-        }
-     }
+     //       //}
+     //       //else if (decision < 0.35f)
+     //       //{
+     //       //    CalculateRepositionTarget();
+     //       //    changeCombatState(ArmedEnemyState.Reposition);
+     //       //}
+     //   }
+     //}
 
      public void RepositionState()
      {
            Agent.isStopped = false;
 
-        animator.SetBool("Iswalking", true);
-        animator.SetBool("Isidle", false);
 
         Agent.SetDestination(repositionTarget);
 
@@ -218,53 +197,53 @@ public class ArmedEnemy : EnemyAI
 
      }
 
-    private void CalculateRepositionTarget()
-    {
-        if(player == null) { return; }
+    //private void CalculateRepositionTarget()
+    //{
+    //    if(player == null) { return; }
 
-        Vector3 directionToPlayer = (player.position - transform.position);
+    //    //Vector3 directionToPlayer = (player.position - transform.position);
 
-        Vector3 SideViewToPlayer = Vector3.Cross(Vector3.up , directionToPlayer);
+    //  //  Vector3 SideViewToPlayer = Vector3.Cross(Vector3.up , directionToPlayer);
 
-        if (Random.value > 0.5f)
-            SideViewToPlayer *= -1f;
+    //    if (Random.value > 0.5f)
+    //        SideViewToPlayer *= -1f;
 
-        Vector3 candidate = transform.position + SideViewToPlayer * repositionDistance;
-
-
-        if (NavMesh.SamplePosition(candidate , out NavMeshHit hit , 3f, NavMesh.AllAreas)) 
-        {
-            repositionTarget = hit.position;
-        }
-    }
-
-     public void SeekCoverState()
-     {
-        Agent.isStopped = false;
-
-        animator.SetBool("Iswalking", true);
-        animator.SetBool("isIdle", false);
-
-        if (currentCover == null)
-        {
-            currentCover = FindBestCover();
-
-            if (currentCover == null)
-            {
-                changeCombatState(ArmedEnemyState.Combat);
-                return;
-            }
-        }
-
-        Agent.SetDestination(currentCover.position);
-
-        if (!Agent.pathPending && Agent.remainingDistance <= .7f)
-        {
-            changeCombatState(ArmedEnemyState.TakeCover);
-        }
+    //    Vector3 candidate = transform.position + SideViewToPlayer * repositionDistance;
 
 
-    }
+    //    if (NavMesh.SamplePosition(candidate , out NavMeshHit hit , 3f, NavMesh.AllAreas)) 
+    //    {
+    //        repositionTarget = hit.position;
+    //    }
+    //}
+
+    // public void SeekCoverState()
+    // {
+    //    Agent.isStopped = false;
+
+    //    animator.SetBool("Iswalking", true);
+    //    animator.SetBool("isIdle", false);
+
+    //    if (currentCover == null)
+    //    {
+    //        currentCover = FindBestCover();
+
+    //        if (currentCover == null)
+    //        {
+    //            changeCombatState(ArmedEnemyState.Combat);
+    //            return;
+    //        }
+    //    }
+
+    //    Agent.SetDestination(currentCover.position);
+
+    //    if (!Agent.pathPending && Agent.remainingDistance <= .7f)
+    //    {
+    //        changeCombatState(ArmedEnemyState.TakeCover);
+    //    }
+
+
+    //}
 
     public Transform FindBestCover()
     {
@@ -275,12 +254,10 @@ public class ArmedEnemy : EnemyAI
     {
         Agent.isStopped = true;
 
-        animator.SetBool("Iswalking", false);
-        animator.SetBool("isIdle", true);
-
+       
         stateTimer += Time.deltaTime;
 
-        if (CanseePlayer())
+       // if (CanseePlayer())
         {
             changeCombatState(ArmedEnemyState.Combat);
             return;
@@ -295,11 +272,10 @@ public class ArmedEnemy : EnemyAI
     {
         Agent.isStopped = true;
 
-        animator.SetBool("isIdle",true);
-
+ 
         stateTimer += Time.deltaTime;
 
-        if (CanseePlayer())
+       // if (CanseePlayer())
         {
             changeCombatState(ArmedEnemyState.Combat);
             return;
@@ -318,12 +294,10 @@ public class ArmedEnemy : EnemyAI
     {
         Agent.isStopped = false;
 
-        animator.SetBool("Iswalking", true);
-        animator.SetBool("isIdle", false);
-
-        if (CanseePlayer())
+ 
+       // if (CanseePlayer())
         {
-            lastKnownPlayerPosition = player.position;
+           // lastKnownPlayerPosition = player.position;
 
             changeCombatState(ArmedEnemyState.Combat);
             return;
@@ -334,9 +308,7 @@ public class ArmedEnemy : EnemyAI
         {
             Agent.isStopped = true;
 
-            animator.SetBool("Iswalking", false);
-            animator.SetBool("Isidle", true);
-
+ 
             searchTimer += Time.deltaTime;
 
         }
@@ -351,11 +323,11 @@ public class ArmedEnemy : EnemyAI
 
     public void FacePlayer()
     {
-        if(player == null) return;
+       // if(player == null) return;
 
-        Vector3 lookPosition = new Vector3(player.position.x , transform.position.y , player.position.z);
+       // Vector3 lookPosition = new Vector3(player.position.x , transform.position.y , player.position.z);
 
-        transform.LookAt(lookPosition);
+       // transform.LookAt(lookPosition);
     }
 
     public void HandleShooting()
@@ -403,7 +375,6 @@ public class ArmedEnemy : EnemyAI
 
     private void FireWeapon()
     {
-        animator.SetBool("Rifle_Shoot", true);
     }
 
     

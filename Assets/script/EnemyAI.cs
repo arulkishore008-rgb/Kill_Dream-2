@@ -110,8 +110,7 @@ public class EnemyAI : MonoBehaviour , Ishockable
         AlertImg.SetActive(false);
         GameObject PlayerObj = GameObject.FindGameObjectWithTag("Player");
         globalvolume.profile.TryGet<UnityEngine.Rendering.Universal.Vignette>(out Attackvignette);
-            
-        //playerInt = PlayerInt.transform;
+
         
         if (PlayerObj != null)
         {
