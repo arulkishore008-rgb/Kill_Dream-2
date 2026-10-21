@@ -13,7 +13,7 @@ ModelImporter:
       type: UnityEngine:Texture2D
       assembly: UnityEngine.CoreModule
       name: akai_diffuse
-    second: {fileID: 2800000, guid: b0eab9cd326b6fc4c9339b57fafa9210, type: 3}
+    second: {fileID: 2800000, guid: 412aab6aaaa65f444a23c14f9348f990, type: 3}
   materials:
     materialImportMode: 2
     materialName: 0
