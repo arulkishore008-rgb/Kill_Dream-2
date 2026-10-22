@@ -756,7 +756,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: attack
-  m_Speed: 2
+  m_Speed: 1.5
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: 5003771143104739563}
@@ -773,7 +773,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: aab4114359f6e124eb9d3a7c38d84c68, type: 2}
+  m_Motion: {fileID: 7400000, guid: 53a2b65bb92cca64d95803aa0dc5ecd0, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -827,7 +827,7 @@ AnimatorStateTransition:
   m_Mute: 0
   m_IsExit: 0
   serializedVersion: 3
-  m_TransitionDuration: 0.09
+  m_TransitionDuration: 0.06
   m_TransitionOffset: 0
   m_ExitTime: 0.01
   m_HasExitTime: 0
@@ -973,7 +973,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: d2a90109fe0298248913f6f564ba47af, type: 2}
+  m_Motion: {fileID: 7400000, guid: c8cfcd64a46201143b6b36a155cd92a8, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 

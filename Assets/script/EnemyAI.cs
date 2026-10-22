@@ -105,6 +105,10 @@ public class EnemyAI : MonoBehaviour , Ishockable
     }
     public void Start()
     {
+        if (NavMeshAgent.isOnNavMesh)
+        {
+            print("ON PLANE ");
+        }
         GoTonextpatrolpoint();
          PlayerCam = Camera.main;
         AlertImg.SetActive(false);
@@ -331,14 +335,17 @@ public class EnemyAI : MonoBehaviour , Ishockable
                 animator.SetBool("Isidle", false);
 
                 Following();
-
+                
+                if (player != null)
+                {
+                    NavMeshAgent.isStopped = false;
+                    NavMeshAgent.SetDestination(player.position);
+                }
 
                 if (!seesPlayer)
                 {
-                    NavMeshAgent.isStopped = false;
-                    NavMeshAgent.SetDestination(LastKnownPosition);
 
-
+                    LastKnownPosition = player.position;
                     _state = Enemystate.Investigating;
                 }
                 else if (DistToPlayer <= AttackRadius && CanseePlayer())
