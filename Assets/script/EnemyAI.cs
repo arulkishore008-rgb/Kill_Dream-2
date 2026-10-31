@@ -75,7 +75,7 @@ public class EnemyAI : MonoBehaviour , Ishockable
         Searching,
         Following,
         Processing,
-        Attack,
+        Attack, 
         Dead
     }
     private Enemystate _state = Enemystate.Patrolling;
@@ -98,7 +98,7 @@ public class EnemyAI : MonoBehaviour , Ishockable
         NavMeshAgent.isStopped = false;
     }
 
-    private void Awake()
+    protected virtual void Awake()
     {
         NavMeshAgent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
@@ -335,12 +335,6 @@ public class EnemyAI : MonoBehaviour , Ishockable
                 animator.SetBool("Isidle", false);
 
                 Following();
-                
-                if (player != null)
-                {
-                    NavMeshAgent.isStopped = false;
-                    NavMeshAgent.SetDestination(player.position);
-                }
 
                 if (!seesPlayer)
                 {

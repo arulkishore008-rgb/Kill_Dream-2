@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Net.Http.Headers;
 using Unity.Collections;
 using Unity.Services.Analytics;
 using Unity.VisualScripting;
@@ -11,6 +12,9 @@ using static Interfaces;
 
 public class fpsmovement : MonoBehaviour 
 {
+  //  public GameObject knife;
+    private bool Hasthrown;
+
     Rigidbody rb;
     public Transform EnemyInteractPoint;
     private Wallrunning Wallrunscript;
@@ -81,14 +85,14 @@ public class fpsmovement : MonoBehaviour
 
     public float CurrentHealth = 0f;
 
-    // private Animator anim;
+     public Animator anim;
 
     void Start()
     {
         startPos = camHolder.localPosition;
         rb = GetComponent<Rigidbody>();
         Wallrunscript = GetComponent<Wallrunning>();
-      //  anim = GetComponent<Animator>();
+        anim = GetComponent<Animator>();
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         transform.rotation = Quaternion.identity;
@@ -108,14 +112,20 @@ public class fpsmovement : MonoBehaviour
 
         if (IsSprinting)
         {
-            bobSpeed = 12f;
-            bobAmount = .08f;
+            anim.SetBool("isIdle", false);
+            anim.SetBool("isSprinting", true);
+
+            bobSpeed = 10f;
+            bobAmount = .07f;
 
         }
         else
         {
+            anim.SetBool("isIdle", true);
+            anim.SetBool("isSprinting", false);
+
             bobSpeed = 7f;
-            bobAmount = .05f;
+            bobAmount = .04f;
 
         }
 
@@ -124,16 +134,33 @@ public class fpsmovement : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space) && Canjump)  // JUMP
         {
             //if (!Wallrunscript.IsWallrunning )
-            {
-                {
+                
+
                     rb.AddForce(Vector3.up * jumpforce , ForceMode.Impulse);
 
-                }
+        }
+        if (Canjump)
+        {
+            if (Currentspeed >= 4f)
+            {
+                anim.SetBool("isSprinting", true);
+                anim.SetBool("isIdle", false);
+
             }
+
+            anim.SetBool("isJumping", false);
+
+        }
+        else if (!Canjump)
+        {
+            anim.SetBool("isIdle", false);
+            anim.SetBool("isSprinting", false);
+
+            anim.SetBool("isJumping", true);
 
         }
 
-        if (Input.GetAxis("Vertical") > .1f || Input.GetAxis("Horizontal") > .1f || Input.GetAxis("Vertical") < -.1f  || Input.GetAxis("Horizontal") < -.1f)
+        if (Input.GetAxis("Vertical") > .1f || Input.GetAxis("Horizontal") > .1f || Input.GetAxis("Vertical") < -.1f || Input.GetAxis("Horizontal") < -.1f)
         {
             Timer += Time.deltaTime * bobSpeed;
             float y = Mathf.Sin(Timer) * bobAmount;
@@ -233,7 +260,7 @@ public class fpsmovement : MonoBehaviour
         mousex += Input.GetAxis("Mouse X") * mousesensitivity;
         mousey -= Input.GetAxis("Mouse Y") * mousesensitivity;
 
-        mousey = Mathf.Clamp(mousey, -60f, 28f);
+        mousey = Mathf.Clamp(mousey, -60f, 30f);
         transform.rotation = Quaternion.Euler(0f, mousex, 0f);
 
 
@@ -277,8 +304,7 @@ public class fpsmovement : MonoBehaviour
 
 
     void Sprint()
-    {
-
+    {        
         IsSprinting = Input.GetKey(KeyCode.LeftShift) && Input.GetAxis("Vertical") > .5f;
 
         Targetspeed = IsSprinting ? Sprintspeed : walkspeed;
@@ -350,6 +376,20 @@ public class fpsmovement : MonoBehaviour
        
     }
 
+    private void throwingmech()
+    {
+        if (Input.GetMouseButton(1))
+        {
+            Quaternion throwknife = Quaternion.Euler(0.1f, 95.3f, -510.1f);
+
+          //  knife.transform.rotation = Quaternion.Slerp(knife.transform.rotation, throwknife , 1f);
+        }
+        else if (Input.GetMouseButtonUp(1))
+        {
+           // knife.transform.localRotation = Quaternion.Euler(0.1f, 95.3f, -361.1f);
+
+        }
+    }
 
 }
 
