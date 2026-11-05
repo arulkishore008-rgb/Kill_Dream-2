@@ -1,9 +1,6 @@
-using System.Security.Cryptography.X509Certificates;
-using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
-using UnityEngine.Animations.Rigging;
-using static UnityEngine.UI.Image;
 
+[RequireComponent(typeof(Rigidbody))]
 public class GrappleHook : MonoBehaviour
 {
     [Header("References")]
@@ -11,137 +8,118 @@ public class GrappleHook : MonoBehaviour
     public Transform GunTip;
     public LineRenderer lr;
     public LayerMask Wall_Layer;
-    public fpsmovement playerMovement; 
+    public fpsmovement playerMovement;
 
     [Header("Settings")]
     public float maxChargeTime = 2f;
     public float maxGrappleDistance = 50f;
     public float flySpeed = 30f;
     public float arcHeight = 2f;
-    // The "States"
-    private float chargeTime = 0f;
-    private bool isCharging = false;
-    private bool isFlying = false;
+    public float maxArrivalDistance = 1.5f;
+    public float MaxFOV = 8f; // Temporary bonus FOV after the grapple.
+
+    public bool IsGrappling { get; private set; }
+    public float flyProgress { get; private set; }
+    public float flyDuration { get; private set; }
+
+    private Rigidbody rb;
+    private Wallrunning wallrunning;
+    private float chargeTime;
+    private bool charging;
     private Vector3 grappleTarget;
-    private Vector3 StartPosition;
-    public float flyProgress = 0f;
-    public float flyDuration = 1f;
+    private Vector3 startPosition;
+    private bool oldGravity;
 
-    public float MaxFOV;
-    public float CurrentFOV;
-    public float LerpTime;
-    private float CamFOV;
-
-
-    private void Start()
+    private void Awake()
     {
-        if (lr != null)
-        {
-            lr.enabled = false;
-        }
+        rb = GetComponent<Rigidbody>();
+        wallrunning = GetComponent<Wallrunning>();
+        if (playerMovement == null) playerMovement = GetComponent<fpsmovement>();
+        if (camHolder == null && playerMovement != null) camHolder = playerMovement.camHolder;
+        if (lr != null) { lr.enabled = false; lr.positionCount = 2; }
     }
-    void Update()
+
+    private void Update()
     {
-        if (isFlying)
-        {
-            FlyToTarget();
-            
-            return;
-        }
+        if (IsGrappling) return;
 
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            isCharging = true;
-            chargeTime = 0f;
-        }
+        if (Input.GetKeyDown(KeyCode.Q)) { charging = true; chargeTime = 0f; }
 
-        if (Input.GetKey(KeyCode.Q) && isCharging)
-        {           
-            chargeTime += Time.deltaTime;
-            chargeTime = Mathf.Clamp(chargeTime, 0f, maxChargeTime);
-        }
+        if (charging && Input.GetKey(KeyCode.Q)) chargeTime = Mathf.Min(maxChargeTime, chargeTime + Time.deltaTime);
 
-        if (Input.GetKeyUp(KeyCode.Q) && isCharging)
+
+        if (charging && Input.GetKeyUp(KeyCode.Q))
         {
-            isCharging = false;
-            //Camera.main.fieldOfView = 80f;
-            if (chargeTime >= 0.1f)
-            {
-                FireHook();
-            }
+            charging = false;
+            if (chargeTime >= 0.1f) FireHook();
         }
     }
 
-    void LateUpdate()
+    private void FixedUpdate()
     {
-        if (isFlying && lr != null && lr.enabled)
+        if (!IsGrappling) return;
+        float duration = Mathf.Max(0.05f, flyDuration);
+        flyProgress = Mathf.Clamp01(flyProgress + Time.fixedDeltaTime / duration);
+        float t = flyProgress;
+        Vector3 destination = Vector3.Lerp(startPosition, grappleTarget, t);
+        destination.y += Mathf.Sin(t * Mathf.PI) * arcHeight;
+        rb.MovePosition(destination);
+        if (t >= 1f) StopGrapple();
+    }
+
+    private void LateUpdate()
+    {
+        if (IsGrappling && lr != null && lr.enabled)
         {
             lr.SetPosition(0, GunTip != null ? GunTip.position : transform.position);
             lr.SetPosition(1, grappleTarget);
         }
     }
 
-    void FireHook()
+    private void FireHook()
     {
-        Ray ray = new Ray(camHolder.position, camHolder.forward);
+        if (camHolder == null || flySpeed <= 0f) return;
+        if (!Physics.Raycast(camHolder.position, camHolder.forward, out RaycastHit hit,
+                maxGrappleDistance, Wall_Layer, QueryTriggerInteraction.Ignore)) return;
 
-        if (Physics.Raycast(ray, out RaycastHit hit, maxGrappleDistance, Wall_Layer))
-        {
-            grappleTarget = hit.point;
-            StartPosition = transform.position;
-            float distance = Vector3.Distance(StartPosition, grappleTarget);
-            flyDuration = distance / flySpeed;
-            flyProgress = 0f;
-
-            isFlying = true;
-
-            if (lr != null)
-            {
-                lr.positionCount = 2;
-                lr.SetPosition(0, GunTip != null ? GunTip.position : transform.position);
-                lr.SetPosition(1, grappleTarget);
-                lr.enabled = true;
-            }
-
-            if (playerMovement != null) playerMovement.enabled = false;
-        }
-        else
-        {
-            Debug.Log("Grapple missedddddd Nothing in range");
-        }
-    }
-
-    void FlyToTarget()
-    {
-        flyProgress += Time.deltaTime / flyDuration;
-        float t = Mathf.Clamp01(flyProgress);
-
-        Vector3 linearPosition = Vector3.Lerp(StartPosition ,grappleTarget ,t);
-
-        float CurrentArcHeight = Mathf.Sin(t * Mathf.PI) * arcHeight; 
-
-        transform.position = linearPosition + (Vector3.up * CurrentArcHeight);
-
-        if (t >= 1f)
-        {
-          StopGrapple();        
-        }
-    }
-
-
-    void StopGrapple()
-    {
-        isFlying = false;
-
-        // Turn off line visual upon arrival
+        if (wallrunning != null) wallrunning.CancelWallrun();
+        startPosition = rb.position;
+        // Stop slightly short of the wall rather than place the player inside it.
+        grappleTarget = hit.point - camHolder.forward * maxArrivalDistance;
+        flyDuration = Mathf.Max(0.05f, Vector3.Distance(startPosition, grappleTarget) / flySpeed);
+        flyProgress = 0f;
+        oldGravity = rb.useGravity;
+        rb.useGravity = false;
+        rb.linearVelocity = Vector3.zero;
+        IsGrappling = true;
+        if (playerMovement != null) playerMovement.SetGrappleMovementLocked(true);
         if (lr != null)
         {
-            lr.enabled = false;
+            lr.enabled = true;
+            lr.SetPosition(0, GunTip != null ? GunTip.position : transform.position);
+            lr.SetPosition(1, grappleTarget);
         }
+    }
 
-        float chargePercent = chargeTime / maxChargeTime;
-        Camera.main.fieldOfView = Mathf.Lerp(CurrentFOV, MaxFOV, chargePercent);
+    private void StopGrapple()
+    {
+        IsGrappling = false;
+        rb.useGravity = oldGravity;
+        rb.linearVelocity = Vector3.zero;
+        if (lr != null) lr.enabled = false;
+        if (playerMovement != null)
+        {
+            playerMovement.SetGrappleMovementLocked(false);
+            playerMovement.AddFovKick(MaxFOV * Mathf.Clamp01(chargeTime / Mathf.Max(0.01f, maxChargeTime)));
+        }
+    }
 
-        if (playerMovement != null) playerMovement.enabled = true;
+    private void OnDisable()
+    {
+        if (!IsGrappling) return;
+        IsGrappling = false;
+        if (rb != null) rb.useGravity = oldGravity;
+        if (lr != null) lr.enabled = false;
+        if (playerMovement != null) playerMovement.SetGrappleMovementLocked(false);
     }
 }

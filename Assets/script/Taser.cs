@@ -110,7 +110,7 @@ public class Taser : MonoBehaviour , Iweapon
         {
             int CurrentCharge = Inventorynew.instance.GetEquippedItemAmount();
 
-            if (CurrentCharge < 3)
+            if (CurrentCharge < 1)
             {
                 Debug.Log("taser's charge is done");
                 return; 
@@ -137,7 +137,7 @@ public class Taser : MonoBehaviour , Iweapon
         if (Inventorynew.instance != null)
         {
             Debug.Log("5. Consuming ammo and clearing hand.");
-            Inventorynew.instance.ConsumeEquippedItem(3);
+            Inventorynew.instance.ConsumeEquippedItem(1);
             Inventorynew.instance.Equipping();
         }
     }

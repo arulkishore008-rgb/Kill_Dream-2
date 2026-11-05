@@ -3,52 +3,7 @@ guid: 3203dd773d51d5b4e8ff4cb285080842
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Board_Cover
-    second: {fileID: 2100000, guid: 18bf682b1f3163d4c8c59422d1024657, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Building1
-    second: {fileID: 2100000, guid: 9d06a05d29f670a4494194fadca416c7, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: ROD1
-    second: {fileID: 2100000, guid: d6d5bc681a0bcf2498aeafade0e7401c, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Windo
-    second: {fileID: 2100000, guid: a08c71399d1916641939afe342baf3c0, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: blinn14
-    second: {fileID: 2100000, guid: 5da569209120d2640892e89dceb3ecdc, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: blinn15
-    second: {fileID: 2100000, guid: 78ab73c1a72947341938283cd8e824ee, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: exhast3
-    second: {fileID: 2100000, guid: 797e7b7d68961d34485df1844dfc4ada, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: openPBR_shader1
-    second: {fileID: 2100000, guid: 3d2ec2bc5d40bc149885098cf16d55f5, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: standardSurface1
-    second: {fileID: 2100000, guid: 060188d824098f9458fc091287160d16, type: 2}
+  externalObjects: {}
   materials:
     materialImportMode: 2
     materialName: 0

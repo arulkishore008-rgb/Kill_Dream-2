@@ -5,7 +5,7 @@ public class Wallrunning : MonoBehaviour
     [Header("Wallrunning")]
     public LayerMask Iswall;
     public LayerMask Isground;
-     
+
     public float WallrunSpeed;
     public float Wallruntimer;
     public float Wallrunforce;
@@ -30,23 +30,30 @@ public class Wallrunning : MonoBehaviour
     public bool IsWallrunning;
 
     private Rigidbody rb;
+    private GrappleHook grapple;
     public Transform CamHolder;
 
     [Header("Exiting")]
     public bool exitingWall;
     public float exitingWalltime;
     public float exitingWallTimer;
-    
-    
+
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        grapple = GetComponent<GrappleHook>();
     }
 
     void Update()
     {
+        if (grapple != null && grapple.IsGrappling)
+        {
+            if (IsWallrunning) stopwallrun();
+            return;
+        }
         Checkforwall();
- 
+
         if (IsWallrunning && Input.GetKeyDown(KeyCode.Space))
         {
             Walljump();
@@ -58,6 +65,7 @@ public class Wallrunning : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (grapple != null && grapple.IsGrappling) return;
         if (IsWallrunning)
         {
             WallRunning();
@@ -76,20 +84,20 @@ public class Wallrunning : MonoBehaviour
         horizontalinput = Input.GetAxis("Horizontal");
         verticalinput = Input.GetAxis("Vertical");
 
-         if (exitingWall)     // 1
-    {
-          if (IsWallrunning)
-                        stopwallrun();
+        if (exitingWall)     // 1
+        {
+            if (IsWallrunning)
+                stopwallrun();
 
-          if (exitingWallTimer > 0)
-                        exitingWallTimer -= Time.deltaTime;
+            if (exitingWallTimer > 0)
+                exitingWallTimer -= Time.deltaTime;
 
-              else
-              exitingWall = false;
-             
-    }
-        
-        if ((wallleft || wallright ) && verticalinput > 0f && Aboveground() && !exitingWall)
+            else
+                exitingWall = false;
+
+        }
+
+        if ((wallleft || wallright) && verticalinput > 0f && Aboveground() && !exitingWall)
         {
             if (!IsWallrunning)  // 2
             {
@@ -97,13 +105,13 @@ public class Wallrunning : MonoBehaviour
 
             }
 
-                //if (Input.GetKeyDown(KeyCode.Space))
-                //{
-                //    Walljump();
-                //}
+            //if (Input.GetKeyDown(KeyCode.Space))
+            //{
+            //    Walljump();
+            //}
 
-                if (Wallruntimer > 0)
-                    Wallruntimer -= Time.deltaTime;
+            if (Wallruntimer > 0)
+                Wallruntimer -= Time.deltaTime;
 
             if (Wallruntimer <= 0 && IsWallrunning)
             {
@@ -112,22 +120,22 @@ public class Wallrunning : MonoBehaviour
             }
         }
 
-            else    // 3
-            {
-                if(IsWallrunning)
-                 stopwallrun();
-            }
+        else    // 3
+        {
+            if (IsWallrunning)
+                stopwallrun();
+        }
     }
-    
+
 
     private void WallRunning()
     {
         rb.useGravity = false;
         rb.linearVelocity = new Vector3(rb.linearVelocity.x, 0f, rb.linearVelocity.z);
         Vector3 WallNormal = wallright ? Isrightwallhit.normal : Isleftwallhit.normal;
-        Vector3 WallForward = Vector3.Cross(WallNormal,transform.up);
+        Vector3 WallForward = Vector3.Cross(WallNormal, transform.up);
 
-        if ((transform.forward - WallForward).magnitude > (transform.forward -  -WallForward).magnitude) 
+        if ((transform.forward - WallForward).magnitude > (transform.forward - -WallForward).magnitude)
         {
             WallForward = -WallForward;
         }
@@ -149,6 +157,11 @@ public class Wallrunning : MonoBehaviour
         IsWallrunning = true;
         Wallruntimer = MaxWallruntime;
     }
+    public void CancelWallrun()
+    {
+        if (IsWallrunning) stopwallrun();
+    }
+
     void stopwallrun()
     {
         IsWallrunning = false;
@@ -179,6 +192,11 @@ public class Wallrunning : MonoBehaviour
 
         rb.AddForce(forcetoApply, ForceMode.Impulse);
     }
+    private void OnDisable()
+    {
+        if (rb != null && IsWallrunning) stopwallrun();
+    }
+
     private void OnDrawGizmos()
     {
         Debug.DrawRay(CamHolder.position, transform.right * Wallcheckdistance, Color.green);

@@ -385,11 +385,11 @@ public class EnemyAI : MonoBehaviour , Ishockable
     public  virtual void AttackPlayer()
     {
         IsAttacked = true;
-        float punchDistance = .2f;
+        float punchDistance = .5f;
         Vector3 Distance = player.transform.position - transform.position;
        Collider[] punchedEnemies = Physics.OverlapSphere(Handenemy.position, punchDistance, Player_Layer);
 
-        if(punchedEnemies.Length > 0)
+        if (punchedEnemies.Length > 0)
         {
            Debug.Log("ENEMY ATTACKED");
 

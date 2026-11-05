@@ -7,8 +7,13 @@ public class Interfaces
         void Recieveshock(float schockpower);
     }
 
+    public interface Iburst
+    {
+        void Recieveburst(float burstpower);
+    }
+
     public interface Iweapon
     {
-        void useweapon();
+        void useweapon();   
     }
 }

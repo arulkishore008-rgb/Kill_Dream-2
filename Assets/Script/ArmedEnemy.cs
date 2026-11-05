@@ -64,18 +64,18 @@ public class ArmedEnemy : EnemyAI
 
     public override void Update()
     {
-        //base.Update();
+        base.Update();
 
-        CoverPoint targetCover = SeekingbestCover();
+        //CoverPoint targetCover = SeekingbestCover();
 
-        if (targetCover != null)
-        {
-            targetCover.isOccupied = true;
-            targetCover.currentOccupant = transform;
+        //if (targetCover != null)
+        //{
+        //    targetCover.isOccupied = true;
+        //    targetCover.currentOccupant = transform;
 
-            NavMeshAgent.isStopped = false;
-            NavMeshAgent.SetDestination(targetCover.transform.position);
-        }
+        //    NavMeshAgent.isStopped = false;
+        //    NavMeshAgent.SetDestination(targetCover.transform.position);
+        //}
     }
 
     public override void Following()
@@ -117,30 +117,7 @@ public class ArmedEnemy : EnemyAI
        
     }
 
-    public CoverPoint SeekingbestCover()
-    {
-        CoverPoint[] allCovers = FindObjectsByType<CoverPoint>(FindObjectsSortMode.None);
-
-        CoverPoint bestCover = null;
-        float closestDistance = Mathf.Infinity;
-
-        foreach (CoverPoint cover in allCovers)
-        {
-            if (cover.isOccupied) continue;
-
-            float distance = Vector3.Distance(transform.position, cover.transform.position);
-
-            if (distance < closestDistance)
-            {
-                closestDistance = distance;
-                bestCover = cover;
-            }
-            
-        }
-
-        return bestCover;
-    }
-
+    
     void ReleaseCover()
     {
         if (currentCover != null)
@@ -150,6 +127,7 @@ public class ArmedEnemy : EnemyAI
             currentCover = null;
         }
     }
+
 }
 
 

@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class CoverPoint : MonoBehaviour
 {
-    public bool isOccupied;
+    public bool isOccupied = false;
     public Transform currentOccupant;
     void Start()
     {
