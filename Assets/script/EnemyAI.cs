@@ -107,6 +107,10 @@ public class EnemyAI : MonoBehaviour, Ishockable
     protected NavMeshAgent NavMeshAgent;
     protected Animator animator;
 
+    [Header("Animation Binding")]
+    [Tooltip("Assign the Animator on the rigged visual child. Existing enemies can keep their current Animator when empty.")]
+    [SerializeField] protected Animator animationAnimator;
+
     private Enemystate _state = Enemystate.Patrolling;
     private readonly HashSet<int> animatorParameters = new HashSet<int>();
     private Vignette attackVignette;
@@ -165,7 +169,7 @@ public class EnemyAI : MonoBehaviour, Ishockable
     protected virtual void Awake()
     {
         NavMeshAgent = GetComponent<NavMeshAgent>();
-        animator = GetComponent<Animator>();
+        animator = animationAnimator != null ? animationAnimator : GetComponent<Animator>();
         if (animator == null)
             animator = GetComponentInChildren<Animator>();
 
@@ -1026,7 +1030,7 @@ public class EnemyAI : MonoBehaviour, Ishockable
             animator.SetBool(hash, value);
     }
 
-    private void SetAnimatorInt(int hash, int value)
+    protected void SetAnimatorInt(int hash, int value)
     {
         if (animator != null && animatorParameters.Contains(hash))
             animator.SetInteger(hash, value);

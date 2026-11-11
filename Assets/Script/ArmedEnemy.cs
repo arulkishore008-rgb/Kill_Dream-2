@@ -38,6 +38,54 @@ public class ArmedEnemy : EnemyAI
     [Min(0.01f)] public float stuckMinimumProgress = 0.18f;
     [SerializeField] private bool debugCombatMovement;
 
+    [Header("Animation Layers")]
+    [SerializeField] private string upperBodyLayerName = "Weapon UpperBody";
+    [Min(0f)][SerializeField] private float upperBodyBlendSpeed = 10f;
+    private int upperBodyLayerIndex = -1;
+    private KillDream.KDArmedAimPitch weaponPresentation;
+    private CapsuleCollider hitCapsule;
+    private Transform aimPlayer;
+    private Collider aimCollider;
+
+    public Vector3 AimTargetPosition
+    {
+        get
+        {
+            if (aimCollider != null && aimCollider.enabled && aimCollider.gameObject.activeInHierarchy)
+            {
+                Bounds body = aimCollider.bounds;
+                return body.center + Vector3.up * (body.extents.y * 0.2f);
+            }
+            return player != null ? player.position + Vector3.up * playerTargetHeight : transform.position;
+        }
+    }
+
+    private void RefreshAimTarget()
+    {
+        if (aimPlayer != player)
+        {
+            aimPlayer = player;
+            aimCollider = null;
+            float largest = -1f;
+            if (player != null)
+                foreach (Collider candidate in player.GetComponentsInChildren<Collider>(true))
+                {
+                    if (!candidate.enabled || candidate.isTrigger || !candidate.gameObject.activeInHierarchy) continue;
+                    float size = candidate.bounds.size.sqrMagnitude;
+                    if (size <= largest) continue;
+                    largest = size;
+                    aimCollider = candidate;
+                }
+        }
+        // The player pivot may be at the hips/camera instead of the feet.
+        // Keep inherited perception and ranged shots aimed at its real body.
+        if (player != null && aimCollider != null && aimCollider.enabled)
+            playerTargetHeight = AimTargetPosition.y - player.position.y;
+    }
+
+    private static readonly int AIStateHash = Animator.StringToHash("AIState");
+    private static readonly int SpeedHash = Animator.StringToHash("Speed");
+    private static readonly int IsAimingHash = Animator.StringToHash("IsAiming");
     private static readonly int IsIdleHash = Animator.StringToHash("Isidle");
     private static readonly int IsWalkingHash = Animator.StringToHash("Iswalking");
     private static readonly int IsChasingHash = Animator.StringToHash("IsChasing");
@@ -65,7 +113,19 @@ public class ArmedEnemy : EnemyAI
     {
         base.Awake();
         candidatePath = new NavMeshPath();
+        hitCapsule = GetComponent<CapsuleCollider>();
         initialAgentRotation = NavMeshAgent != null && NavMeshAgent.updateRotation;
+
+        if (animator != null)
+        {
+            // Navigation remains the only owner of world movement and rotation.
+            animator.applyRootMotion = false;
+            weaponPresentation = animator.GetComponent<KillDream.KDArmedAimPitch>();
+            if (animator.runtimeAnimatorController != null && !string.IsNullOrEmpty(upperBodyLayerName))
+                upperBodyLayerIndex = animator.GetLayerIndex(upperBodyLayerName);
+            if (upperBodyLayerIndex >= 0)
+                animator.SetLayerWeight(upperBodyLayerIndex, 0f);
+        }
     }
 
     public override void Start()
@@ -73,6 +133,32 @@ public class ArmedEnemy : EnemyAI
         base.Start();
         if (firePoint == null)
             Debug.LogWarning($"{name}: Assign a Fire Point for accurate weapon muzzle positioning.", this);
+    }
+
+    public override void Update()
+    {
+        RefreshAimTarget();
+        base.Update();
+
+        // The base AI returns early after death; the presentation layer must
+        // still fade out so a firing/aim pose cannot override the death clip.
+        bool aiming = !IsDead() && CurrentState == Enemystate.Attack;
+        SetAnimatorInt(AIStateHash, (int)CurrentState);
+        SetAnimatorBool(IsAimingHash, aiming);
+        if (IsDead())
+        {
+            if (hitCapsule != null && hitCapsule.enabled) hitCapsule.enabled = false;
+            SetAnimatorFloat(SpeedHash, 0f, 0.08f);
+            SetAnimatorBool(IsFiringHash, false);
+        }
+
+        if (animator != null && upperBodyLayerIndex >= 0)
+        {
+            float targetWeight = aiming ? 1f : 0f;
+            animator.SetLayerWeight(upperBodyLayerIndex,
+                Mathf.MoveTowards(animator.GetLayerWeight(upperBodyLayerIndex),
+                    targetWeight, upperBodyBlendSpeed * Time.deltaTime));
+        }
     }
 
     protected override bool ShouldEnterAttack()
@@ -340,7 +426,7 @@ public class ArmedEnemy : EnemyAI
         Vector3 muzzlePosition = firePoint != null
             ? firePoint.position
             : transform.position + Vector3.up * eyeHeight + transform.forward * 0.35f;
-        Vector3 targetPosition = player.position + Vector3.up * playerTargetHeight;
+        Vector3 targetPosition = AimTargetPosition;
         Vector3 targetDirection = targetPosition - muzzlePosition;
         if (targetDirection.sqrMagnitude < 0.001f)
             return;
@@ -393,14 +479,27 @@ public class ArmedEnemy : EnemyAI
                     IEnemyMeleeDamageable existingHealth = closestCollider.GetComponentInParent<IEnemyMeleeDamageable>();
                     if (existingHealth != null)
                         existingHealth.ReceiveEnemyMeleeDamage(shotDamage, closestPoint);
-                    else if (!warnedMissingPlayerHealth)
+                    else
                     {
-                        warnedMissingPlayerHealth = true;
-                        Debug.LogWarning($"{name}: Player was hit but has no IEnemyRangedDamageable or IEnemyMeleeDamageable receiver.", this);
+                        // This project's FPS player already owns its health.
+                        // Preserve custom receivers when present; otherwise use
+                        // that existing health API, without requiring another
+                        // damage component or applying the same hit twice.
+                        fpsmovement playerHealth = closestCollider.GetComponentInParent<fpsmovement>();
+                        if (playerHealth != null)
+                            playerHealth.TakeDamage(shotDamage);
+                        else if (!warnedMissingPlayerHealth)
+                        {
+                            warnedMissingPlayerHealth = true;
+                            Debug.LogWarning($"{name}: Player was hit but has no compatible damage receiver or fpsmovement health component.", this);
+                        }
                     }
                 }
             }
         }
+
+        if (weaponPresentation != null)
+            weaponPresentation.ShowShot(muzzlePosition, closestPoint);
 
         if (debugCombatMovement)
             Debug.DrawRay(muzzlePosition, shotDirection * (float.IsInfinity(closestDistance) ? bulletRange : closestDistance), Color.red, 0.4f);
@@ -409,6 +508,8 @@ public class ArmedEnemy : EnemyAI
     protected override void UpdateAnimatorState()
     {
         base.UpdateAnimatorState();
+        float speed = AgentReady() ? NavMeshAgent.velocity.magnitude : 0f;
+        SetAnimatorFloat(SpeedHash, speed, 0.12f);
 
         if (CurrentState == Enemystate.Attack && AgentReady())
         {

@@ -16,6 +16,7 @@ public class fpsmovement : MonoBehaviour
     public Volume globalvolume;
     public LayerMask Ground;
     public LayerMask Enemy_Layer;
+    public GameObject PlayerDied;
 
     [Header("Look")]
     public float mousesensitivity = 1.5f;
@@ -118,7 +119,7 @@ public class fpsmovement : MonoBehaviour
         if (Camera == null) Camera = GetComponentInChildren<Camera>();
         if (camHolder == null && Camera != null) camHolder = Camera.transform.parent != null ? Camera.transform.parent : Camera.transform;
         if (anim == null) anim = GetComponentInChildren<Animator>();
-
+        PlayerDied.SetActive(false);
         if (camHolder == null || Camera == null)
         {
             Debug.LogError("FPS controller needs a Camera and camHolder reference.", this);
@@ -299,6 +300,12 @@ public class fpsmovement : MonoBehaviour
             }
         }
         equippedGun = gun;
+
+        WeaponHandIK handIK = GetComponent<WeaponHandIK>();
+
+        if (handIK != null)
+            handIK.OnGunEquipped(gun);
+
         if (gun == null) IsAiming = false;
     }
 
@@ -408,7 +415,12 @@ public class fpsmovement : MonoBehaviour
     public void TakeDamage(float amount)
     {
         CurrentHealth = Mathf.Max(0f, CurrentHealth - Mathf.Max(0f, amount));
-        if (CurrentHealth <= 0f) { enabled = false; Debug.Log("Player died", this); }
+        if (CurrentHealth <= 0f)
+        { 
+            enabled = false; Debug.Log("Player died", this); 
+            PlayerDied.SetActive(true);
+
+        }
     }
     public void TakeDamage() { TakeDamage(10f); }
 
@@ -416,6 +428,7 @@ public class fpsmovement : MonoBehaviour
     {
         if (Jumpchecktransform != null)
         {
+
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(Jumpchecktransform.position, groundCheckRadius);
         }

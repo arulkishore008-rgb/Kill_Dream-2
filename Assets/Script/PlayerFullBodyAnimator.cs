@@ -58,8 +58,6 @@ public class PlayerFullBodyAnimator : MonoBehaviour
         bool wallRunning = wallrunning != null && wallrunning.IsWallrunning && !grappling;
         bool grounded = fpsmovement.Canjump && !wallRunning && !grappling;
 
-        // Translate actual horizontal Rigidbody velocity into local strafe/forward values.
-        // Our 2D tree uses 0 = idle, +/-0.5 = walking, +1 = forward sprinting.
         Vector3 horizontalVelocity = playerBody.linearVelocity;
         horizontalVelocity.y = 0f;
         Vector3 localVelocity = transform.InverseTransformDirection(horizontalVelocity);
@@ -87,8 +85,6 @@ public class PlayerFullBodyAnimator : MonoBehaviour
         animator.SetBool(Aiming, movement.IsAiming);
         animator.SetBool(Sprinting, movement.IsSprinting);
 
-        // The inventory creates a weapon hand prefab on equip. Read its style, not
-        // the hotbar index: an item can be moved to any slot or picked up later.
         bool hasGun = movement.HasEquippedGun;
         WeaponAnimationStyle style = WeaponAnimationStyle.Unarmed;
         if (hasGun)

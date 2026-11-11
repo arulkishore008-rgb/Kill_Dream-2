@@ -144,7 +144,7 @@ public class Wallrunning : MonoBehaviour
 
         if (!(wallleft && horizontalinput > 0) && !(wallright && horizontalinput < 0))
         {
-            rb.AddForce(-WallNormal * 100f, ForceMode.Force);
+            rb.AddForce(-WallNormal * 10f, ForceMode.Force);
         }
 
     }
