@@ -1,152 +1,136 @@
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Rendering.UI;
 using static Interfaces;
 
-public class Taser : MonoBehaviour , Iweapon
+public class Taser : MonoBehaviour, Iweapon
 {
-    public float raylength;
-    public float throwForce;
-    public float Chargetime;
-    public float Countdown;
-    public float MinChargetime;
-    public float MaxChargetime;
-    public bool CanThrow = false;
+    [Header("References")]
+    private Camera playerCamera;
+
+    [Header("Direct Shock")]
+    public float meleeRange = 3f;
+    public float shockPower = 10f;
+    public float shockCooldown = 0.35f;
+    public LayerMask shockLayers = ~0;
+    public GameObject directShockEffect;
+
+    [Header("Charged Throw")]
+    public bool allowThrow = true;
     public GameObject ProjectilePrerfab;
-    private Vector3 StartPoint;
+    public float throwForce = 10f;
+    public float MinChargetime = 0.4f;
+    public float MaxChargetime = 1.5f;
+    public float throwSpin = 2f;
 
-    public float thickRadius;
-    public float meleeRange;
-    private Camera cam;
+    private float Chargetime;
+    private float nextShockTime;
 
-    private Rigidbody rb;
-    void Start()
+    private void Awake()
     {
-         cam = Camera.main;
+        playerCamera = GetComponentInParent<fpsmovement>()?.Camera;
     }
 
-    void Update()
+    private void Update()
     {
-
-        if (Input.GetKeyDown(KeyCode.E))
+        if (Inventorynew.instance != null && Inventorynew.instance.IsOpen)
         {
-            Taserr();
+            Chargetime = 0f;
+            return;
         }
+
+        if (Input.GetMouseButtonDown(0))
+            Taserr();
+
+        if (!allowThrow)
+            return;
 
         if (Input.GetKey(KeyCode.F))
+            Chargetime = Mathf.Min(Chargetime + Time.deltaTime, Mathf.Max(MinChargetime, MaxChargetime));
+
+        if (Input.GetKeyUp(KeyCode.F))
         {
+            if (Chargetime >= MinChargetime)
+                Throwables();
 
-            Chargetime += Time.deltaTime;
-
-            Chargetime = Mathf.Clamp(Chargetime, 0f, MaxChargetime);
-
-            if (Chargetime >= MinChargetime || Chargetime == MaxChargetime)
-            {
-                CanThrow = true;
-
-            }
-
+            Chargetime = 0f;
         }
-
-            if (Input.GetKeyUp(KeyCode.F))
-            {
-
-                if (CanThrow)
-                {
-                    Debug.Log("RMB RELEASED");
-                    Throwables();
-                    Destroy(gameObject);
-                }
-                else
-                {
-                    Debug.Log("FAILED NOT LONG ENOUGH TO LAUNCH ");
-                }
-                    Chargetime = 0f;
-                    CanThrow = false;
-             }
-
     }
+
     private void Taserr()
     {
+        if (playerCamera == null)
+            playerCamera = Camera.main;
 
-        RaycastHit hit;
+        if (playerCamera == null || Time.time < nextShockTime)
+            return;
 
-         meleeRange = 2.5f; 
-         thickRadius = 0.5f; 
+        nextShockTime = Time.time + shockCooldown;
 
-         StartPoint = cam.transform.position + (cam.transform.forward * 0.5f); 
+        if (!Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward,
+                out RaycastHit hit, meleeRange, shockLayers, QueryTriggerInteraction.Collide))
+            return;
 
-        if (Physics.SphereCast(StartPoint, thickRadius, cam.transform.forward, out hit, meleeRange))
+        Ishockable shockable = hit.collider.GetComponentInParent<Ishockable>();
+        Iignitable ignitable = hit.collider.GetComponentInParent<Iignitable>();
+
+        if (shockable != null)
+            shockable.Recieveshock(shockPower);
+
+        if (ignitable != null)
         {
-            
-            Ishockable shockable = hit.collider.GetComponent<Ishockable>();
-
-            if (shockable != null)
-            {
-                shockable.Recieveshock(10f);
-                Debug.Log("Taser MFF");
-
-            }
-
+            ignitable.Ignite(hit.point);
+            Debug.Log("Taser ignited: " + hit.collider.name, this);
         }
 
-        if (Inventorynew.instance != null)
+        if (directShockEffect != null)
         {
-            Inventorynew.instance.ConsumeEquippedItem(1);
-            Inventorynew.instance.Equipping();
+            GameObject effect = Instantiate(directShockEffect,
+                hit.point + hit.normal * 0.03f,
+                Quaternion.LookRotation(hit.normal));
+            Destroy(effect, 2f);
         }
-
     }
+
     public void useweapon()
     {
-        Debug.Log("gun fire");
+        Taserr();
     }
 
     public void Throwables()
     {
-        Debug.Log("SPAWNING OBJ");
+        if (playerCamera == null)
+            playerCamera = Camera.main;
+
+        if (playerCamera == null || ProjectilePrerfab == null)
+        {
+            Debug.LogWarning("Taser requires a Camera and projectile prefab.", this);
+            return;
+        }
+
+        if (Inventorynew.instance != null && Inventorynew.instance.GetEquippedItemAmount() < 1)
+            return;
+
+        Vector3 spawnPosition = playerCamera.transform.position + playerCamera.transform.forward * 0.8f;
+        GameObject projectile = Instantiate(ProjectilePrerfab, spawnPosition,
+            Quaternion.LookRotation(playerCamera.transform.forward));
+
+        Rigidbody projectileBody = projectile.GetComponent<Rigidbody>();
+
+        if (projectileBody == null)
+        {
+            Debug.LogWarning("Taser projectile needs a Rigidbody on its root.", projectile);
+            Destroy(projectile);
+            return;
+        }
+
+        float chargePercent = Mathf.Clamp01(Chargetime / Mathf.Max(0.01f, MaxChargetime));
+        projectileBody.AddForce(playerCamera.transform.forward * throwForce *
+            Mathf.Lerp(0.65f, 1f, chargePercent), ForceMode.Impulse);
+        projectileBody.AddTorque(Random.insideUnitSphere * throwSpin, ForceMode.Impulse);
 
         if (Inventorynew.instance != null)
         {
-            int CurrentCharge = Inventorynew.instance.GetEquippedItemAmount();
-
-            if (CurrentCharge < 1)
-            {
-                Debug.Log("taser's charge is done");
-                return; 
-            }
-        }
-
-        Vector3 safeSpawnPoint = Camera.main.transform.position + Camera.main.transform.forward;
-        GameObject Throwables = Instantiate(ProjectilePrerfab, safeSpawnPoint, transform.rotation);
-
-        Rigidbody rb = Throwables.GetComponent<Rigidbody>();
-
-        if (rb != null)
-        {
-            Debug.Log("RIGIDBODY FOUND");
-            rb.AddForce(Camera.main.transform.forward * throwForce, ForceMode.Impulse);
-
-            rb.AddTorque(new Vector3(Random.Range(-2f, 2f), Random.Range(-2f, 2f), Random.Range(-2f, 2f)), ForceMode.Impulse);
-        }
-        else
-        {
-            Debug.Log("NO PREFAB INIT");
-        }
-
-        if (Inventorynew.instance != null)
-        {
-            Debug.Log("5. Consuming ammo and clearing hand.");
             Inventorynew.instance.ConsumeEquippedItem(1);
             Inventorynew.instance.Equipping();
         }
     }
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.DrawSphere( StartPoint, thickRadius);
-    }
-
 }
-
-

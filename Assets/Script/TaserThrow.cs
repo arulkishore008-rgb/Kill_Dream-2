@@ -1,54 +1,60 @@
+using System.Collections.Generic;
 using UnityEngine;
-using static Interfaces; 
+using static Interfaces;
 
 public class TaserThrow : MonoBehaviour
 {
-    [Header("Area of Effect Settings")]
+    [Header("Area Shock")]
     public float shockRadius = 4f;
     public float shockPower = 10f;
-    public GameObject electricalSparksEffect; 
+    public LayerMask affectedLayers = ~0;
+    public GameObject electricalSparksEffect;
 
-    private bool hasDischarged = false;
+    private bool hasDischarged;
 
-    
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Player")) return;
-
-        if (hasDischarged) return;
+        if (hasDischarged || collision.gameObject.CompareTag("Player"))
+            return;
 
         TriggerAreaShock();
     }
 
-    void TriggerAreaShock()
+    private void TriggerAreaShock()
     {
         hasDischarged = true;
 
         if (electricalSparksEffect != null)
         {
-            GameObject Sparks = Instantiate(electricalSparksEffect, transform.position, Quaternion.identity);
-
-            Destroy(Sparks , 4f);
+            GameObject sparks = Instantiate(electricalSparksEffect,
+                transform.position, Quaternion.identity);
+            Destroy(sparks, 4f);
         }
 
-        Collider[] colliders = Physics.OverlapSphere(transform.position, shockRadius);
+        Collider[] colliders = Physics.OverlapSphere(transform.position,
+            shockRadius, affectedLayers, QueryTriggerInteraction.Collide);
 
-        foreach (Collider nearbyObj in colliders)
+        HashSet<Ishockable> shockedObjects = new HashSet<Ishockable>();
+        HashSet<Iignitable> ignitedObjects = new HashSet<Iignitable>();
+
+        foreach (Collider nearbyCollider in colliders)
         {
-            
-            Ishockable shockable = nearbyObj.GetComponent<Ishockable>();
-
-            if (shockable != null)
-            {
+            Ishockable shockable = nearbyCollider.GetComponentInParent<Ishockable>();
+            if (shockable != null && shockedObjects.Add(shockable))
                 shockable.Recieveshock(shockPower);
-                Debug.Log("Environmental Shock hit: " + nearbyObj.gameObject.name);
+
+            Iignitable ignitable = nearbyCollider.GetComponentInParent<Iignitable>();
+            if (ignitable != null && ignitedObjects.Add(ignitable))
+            {
+                ignitable.Ignite(nearbyCollider.ClosestPoint(transform.position));
+                Debug.Log("Thrown taser ignited: " + nearbyCollider.name, this);
             }
         }
-             Destroy(gameObject);        
+
+        Destroy(gameObject);
     }
 
-    
-    private void OnDrawGizmos()
+    private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(transform.position, shockRadius);

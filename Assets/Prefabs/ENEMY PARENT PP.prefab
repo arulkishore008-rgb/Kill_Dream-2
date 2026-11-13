@@ -119,7 +119,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -16.25105, y: -1.09144, z: 17.04}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.92222, y: 0.92222, z: 0.92222}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5976102022292801198}
@@ -1707,6 +1707,7 @@ MonoBehaviour:
   MaxIntensity: 0.4
   hitVignetteDuration: 0.35
   logStateChanges: 0
+  animationAnimator: {fileID: 0}
 --- !u!195 &8083930322018434054
 NavMeshAgent:
   m_ObjectHideFlags: 0

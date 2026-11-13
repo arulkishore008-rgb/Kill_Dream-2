@@ -164,6 +164,7 @@ public class fpsmovement : MonoBehaviour
 
     private void Update()
     {
+        Interactable();
         UpdateGrounded();
         ReadInput();
         Look();
@@ -287,7 +288,7 @@ public class fpsmovement : MonoBehaviour
         transform.rotation = Quaternion.Euler(0f, yaw, 0f);
     }
 
-    // Inventorynew calls this after equipping, unequipping or dropping an item.
+    // Inventorynew
     public void SetEquippedGun(EquippableGun gun, Transform handRoot)
     {
         if (weaponRoot != handRoot)
@@ -424,8 +425,28 @@ public class fpsmovement : MonoBehaviour
     }
     public void TakeDamage() { TakeDamage(10f); }
 
+
+    public void Interactable()
+    {
+        if (!Input.GetKeyDown(KeyCode.E))
+            return;
+
+        if (Physics.Raycast(Camera.transform.position,
+            Camera.transform.forward, out RaycastHit hit, 7f))
+        {
+            Barrel barrel = hit.collider.GetComponentInParent<Barrel>();
+
+            if (barrel != null && Input.GetKeyDown(KeyCode.E))
+            {
+                barrel.KnockOver(Camera.transform.forward);
+            }
+        }
+    }
+
     private void OnDrawGizmosSelected()
     {
+        Gizmos.DrawRay(Camera.transform.position, Camera.transform.forward * 7f);
+
         if (Jumpchecktransform != null)
         {
 

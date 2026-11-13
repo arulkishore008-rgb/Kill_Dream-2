@@ -2,6 +2,12 @@ using UnityEngine;
 
 public class Interfaces 
 {
+
+    public interface Iignitable
+    {
+        void Ignite(Vector3 ignitionPoint);
+    }
+
    public interface Ishockable
     {
         void Recieveshock(float schockpower);
